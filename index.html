@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <title>TIME IS RESPECT — คำนวณความจริง</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Prompt:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+</head>
+<body>
+  <div class="status-strip">SYSTEM · ONLINE <span>· TIME IS RESPECT</span></div>
+  <nav class="nav">
+    <div class="brand">TIME IS RESPECT</div>
+    <button class="nav-btn">LIVE DASHBOARD</button>
+  </nav>
+
+  <div class="main">
+    <section class="hero">
+      <div class="eyebrow">THE REAL-TIME EXCUSE DASHBOARD</div>
+      <h1>เวลาของทุกคน<br><span>มีค่าเท่ากัน.</span></h1>
+      <div class="hero-copy">ลองคำนวณ “คำว่ากำลังไป” ด้วยเวลาจริงของคุณ</div>
+      <div class="hero-copy">ไม่ต้องเดา — ให้เวลาเป็นคนตอบ</div>
+
+      <div class="card" id="personal">
+        <div class="card-label">STEP 01 · YOUR EXCUSE</div>
+        <div class="small">วันนี้ “กำลังไป” ด้วยเหตุผลอะไร?</div>
+        <div class="excuse-grid">
+          <button class="excuse-btn" data-excuse="เพิ่งตื่น">เพิ่งตื่น</button>
+          <button class="excuse-btn" data-excuse="รอวินมอเตอร์ไซค์">รอวินมอเตอร์ไซค์</button>
+          <button class="excuse-btn" data-excuse="รถติด">รถติด</button>
+          <button class="excuse-btn" data-excuse="ติดไฟแดง">ติดไฟแดง</button>
+          <button class="excuse-btn" data-excuse="หาของไม่เจอ">หาของไม่เจอ</button>
+          <button class="excuse-btn" data-excuse="กำลังแต่งตัว">กำลังแต่งตัว</button>
+          <button class="excuse-btn" data-excuse="อื่น ๆ">อื่น ๆ</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">STEP 02 · YOUR ESTIMATE</div>
+        <label class="input-label" for="estimatedInput">คิดว่าจะถึงในกี่นาที?</label>
+        <input id="estimatedInput" type="number" min="1" max="360" placeholder="เช่น 15">
+        <div class="hint">เวลาที่คุณ “คิดว่า” จะใช้ ก่อนเริ่มจับจริง</div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">STEP 03 · REAL TIME</div>
+        <div class="timer" id="timer">00:00</div>
+        <div class="small">เมื่อออกเดินทาง กดเริ่ม แล้วกลับมากด I'M HERE เมื่อถึงจริง</div>
+      </div>
+
+      <button class="start-btn" id="startBtn">START · กำลังไป</button>
+      <button class="finish-btn" id="finishBtn">I'M HERE</button>
+      <div class="result result-box"></div>
+    </section>
+
+    <section class="dashboard" id="dashboard">
+      <div class="eyebrow">LIVE DATA</div>
+      <h2>ความจริงของทุกคน</h2>
+      <div class="small">ข้อมูลรวมจากผู้เข้าร่วมทั้งหมด · รีเฟรชอัตโนมัติ</div>
+      <div class="dashboard-grid">
+        <div class="stat">
+          <div class="stat-label">ผู้เข้าร่วม</div>
+          <div class="stat-value">—</div>
+          <div class="stat-label">คน</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">เวลาจริงเฉลี่ย</div>
+          <div class="stat-value">—</div>
+          <div class="stat-label">นาที</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="medianCount">—</div>
+          <div class="stat-label">ค่ากลาง Median</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">เวลาที่รอรวม</div>
+          <div class="stat-value" id="waitTotal">—</div>
+          <div class="stat-label">นาที</div>
+        </div>
+      </div>
+      <div class="dashboard-note" id="dashboardNote">กำลังโหลดข้อมูล...</div>
+    </section>
+
+    <section class="excuse-list" id="excuseList"></section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
