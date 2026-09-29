@@ -11,6 +11,6 @@
   - NEVER put the Supabase service_role/secret key here.
 */
 window.SUPABASE_CONFIG = {
-  url: "https://drttsdoymunhpfmxycvi.supabase.co/rest/v1/",
+  url: "https://drttsdoymunhpfmxycvi.supabase.co",
   anonKey: "sb_publishable_MCwN7UWxUFx64fXIrK-AfA_quKm6kI7"
 };
