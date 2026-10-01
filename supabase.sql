@@ -53,6 +53,7 @@ as $$
     'average_estimated_minutes', coalesce(round(avg(estimated_minutes)::numeric, 1), 0),
     'median_minutes', coalesce(round(percentile_cont(0.5) within group (order by actual_minutes)::numeric, 1), 0),
     'average_gap', coalesce(round(avg(abs(actual_minutes - estimated_minutes))::numeric, 1), 0),
+    'late_count', count(*) filter (where actual_minutes > estimated_minutes),
     'excuses',
       coalesce(
         (
