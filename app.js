@@ -1,6 +1,6 @@
 const config=window.SUPABASE_CONFIG||{};
 const isConfigured=/^https:\/\/.+\.supabase\.co$/.test(config.url||"")&&!!config.anonKey&&!config.anonKey.includes("PASTE_YOUR_");
-const state={excuse:null,estimated:null,startedAt:null,timerInterval:null,supabase:null,demo:!isConfigured};
+const state={excuse:null,estimated:null,startedAt:null,actualMinutes:null,timerInterval:null,supabase:null,demo:!isConfigured,completed:false};
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 function formatMinutes(v){const n=Number(v||0);return Number.isInteger(n)?String(n):n.toFixed(1)}
 function formatClock(sec){const s=Math.max(0,Math.floor(sec||0));return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")}
@@ -17,20 +17,49 @@ function renderStats(stats){$("#peopleCount").textContent=formatMinutes(stats.pe
 async function fetchStats(){if(state.demo){renderStats(buildStats(demoRows()));return}const{data,error}=await state.supabase.rpc("get_dashboard_stats");if(error){console.error(error);showStatus("DATABASE ERROR · ตรวจสอบ Supabase SQL / Policy","error");$("#dashboardNote").textContent=error.message;return}const s=data||{};renderStats({people:Number(s.people||0),avg:Number(s.average_minutes||0),median:Number(s.median_minutes||0),total:Number(s.total_minutes||0),avgGap:Number(s.average_gap||0),excuseMap:Object.fromEntries((s.excuses||[]).map(x=>[x.excuse,Number(x.count)]))})}
 async function submitRow(actualMinutes){const row={excuse:state.excuse,estimated_minutes:Number(state.estimated),actual_minutes:Number(actualMinutes)};if(state.demo){saveDemoRow(row);return{ok:true}}const{error}=await state.supabase.from("sessions").insert(row);if(error){console.error(error);return{ok:false,error}}return{ok:true}}
 function startExperience(){$("#intro").classList.add("hidden");$("#experience").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"})}
-function resetRun(){state.excuse=null;state.estimated=null;state.startedAt=null;clearInterval(state.timerInterval);state.timerInterval=null;$$(".excuse-btn").forEach(b=>b.classList.remove("selected"));$("#estimatedInput").value="";$("#estimateReadout").textContent="—";$("#timer").textContent="00:00";$("#timerMessage").textContent="“กำลังไป” เริ่มต้นที่นี่";$("#stageState").textContent="READY";$("#timeStage").classList.remove("running","over");$("#finishBtn").classList.remove("show");$("#startBtn").disabled=false;$("#resultBox").classList.remove("show");$("#resetBtn").classList.remove("show")}
+function resetRun(){state.excuse=null;state.estimated=null;state.startedAt=null;state.actualMinutes=null;state.completed=false;clearInterval(state.timerInterval);state.timerInterval=null;$$(".excuse-btn").forEach(b=>b.classList.remove("selected"));$("#estimatedInput").value="";$("#estimateReadout").textContent="—";$("#timer").textContent="00:00";$("#timerMessage").textContent="“กำลังไป” เริ่มต้นที่นี่";$("#stageState").textContent="READY";$("#timeStage").classList.remove("running","over");$("#finishBtn").classList.remove("show");$("#startBtn").disabled=false;$("#resultBox").classList.remove("show");$("#shareBtn").classList.remove("show");$("#resetBtn").classList.remove("show");$("#timerProgress").style.width="0%"}
 async function finishRun(){if(!state.startedAt)return;const actualSeconds=elapsedSeconds(),actualMinutes=Math.max(.1,actualSeconds/60);$("#finishBtn").disabled=true;const result=await submitRow(actualMinutes);if(!result.ok){$("#finishBtn").disabled=false;$("#resultBox").classList.add("show");$("#resultBox").innerHTML='<div class="receipt-label">DATABASE ERROR</div><div class="receipt-copy">บันทึกไม่สำเร็จ ลองอีกครั้งในอีกสักครู่</div>';return}const estimate=Number(state.estimated),diff=actualMinutes-estimate,diffText=diff>0?"+"+formatMinutes(diff):formatMinutes(diff),message=diff>0?"คุณใช้เวลาจริงมากกว่าที่คิด "+formatMinutes(diff)+" นาที":diff<0?"คุณถึงเร็วกว่าเวลาที่คิดไว้ "+formatMinutes(Math.abs(diff))+" นาที":"เกือบตรงเป๊ะ";$("#resultBox").innerHTML='<div class="receipt-label">TIME RECEIPT · YOUR RESULT</div><div class="receipt-number">'+diffText+' MIN</div><div class="receipt-copy">'+message+'.<br>เวลาที่คลาดเคลื่อนอาจดูเล็กสำหรับคุณ แต่เวลาของคนที่รอก็เดินไปพร้อมกัน</div><div class="receipt-meta"><div><small>YOUR ESTIMATE</small><strong>'+formatMinutes(estimate)+' MIN</strong></div><div><small>ACTUAL TIME</small><strong>'+formatMinutes(actualMinutes)+' MIN</strong></div><div><small>YOUR EXCUSE</small><strong>'+escapeHtml(state.excuse)+'</strong></div><div><small>STATUS</small><strong>'+(diff>0?"LATE BY "+formatMinutes(diff)+" MIN":"ON TIME")+'</strong></div></div>';$("#resultBox").classList.add("show");$("#finishBtn").classList.remove("show");$("#resetBtn").classList.add("show");clearInterval(state.timerInterval);state.timerInterval=null;$("#startBtn").disabled=false;await fetchStats()}
-function startRun(){const estimate=Number($("#estimatedInput").value);if(!state.excuse){alert("เลือกเหตุผลก่อน");return}if(!Number.isFinite(estimate)||estimate<1||estimate>360){alert("ใส่เวลาที่คิดว่าจะถึงระหว่าง 1–360 นาที");return}state.estimated=estimate;state.startedAt=Date.now();$("#estimateReadout").textContent=formatMinutes(estimate)+" MIN";$("#startBtn").disabled=true;$("#finishBtn").classList.add("show");$("#resultBox").classList.remove("show");$("#resetBtn").classList.remove("show");$("#shareBtn").classList.remove("show");$("#timeStage").classList.add("running");$("#stageState").textContent="RUNNING";clearInterval(state.timerInterval);state.timerInterval=setInterval(renderTimer,1000);renderTimer()}
+function startRun(){const estimate=Number($("#estimatedInput").value);if(!state.excuse){alert("เลือกเหตุผลก่อน");return}if(!Number.isFinite(estimate)||estimate<1||estimate>360){alert("ใส่เวลาที่คิดว่าจะถึงระหว่าง 1–360 นาที");return}state.estimated=estimate;state.actualMinutes=null;state.completed=false;state.startedAt=Date.now();$("#estimateReadout").textContent=formatMinutes(estimate)+" MIN";$("#startBtn").disabled=true;$("#finishBtn").classList.add("show");$("#resultBox").classList.remove("show");$("#resetBtn").classList.remove("show");$("#shareBtn").classList.remove("show");$("#timeStage").classList.add("running");$("#stageState").textContent="RUNNING";clearInterval(state.timerInterval);state.timerInterval=setInterval(renderTimer,1000);renderTimer()}
 async function init(){$("#beginBtn").addEventListener("click",startExperience);$("#dashboardBtn").addEventListener("click",()=>$("#dashboard").scrollIntoView({behavior:"smooth"}));$("#resetBtn").addEventListener("click",resetRun);$$(".excuse-btn").forEach(btn=>btn.addEventListener("click",()=>{if(state.startedAt)return;$$(".excuse-btn").forEach(b=>b.classList.remove("selected"));btn.classList.add("selected");state.excuse=btn.dataset.excuse}));$("#startBtn").addEventListener("click",startRun);$("#finishBtn").addEventListener("click",finishRun);$("#shareBtn").addEventListener("click",shareReceipt);document.addEventListener("visibilitychange",()=>{if(state.startedAt)renderTimer();});if(state.demo){showStatus("DEMO MODE · ยังไม่ได้เชื่อม Supabase","demo")}else{const{createClient}=window.supabase;state.supabase=createClient(config.url,config.anonKey);showStatus("SYSTEM · LIVE DATABASE CONNECTED")}await fetchStats();if(!state.demo){try{state.supabase.channel("sessions-live").on("postgres_changes",{event:"INSERT",schema:"public",table:"sessions"},fetchStats).subscribe()}catch(e){console.warn("Realtime subscription unavailable",e)}setInterval(fetchStats,15000)}}
 init();
 async function shareReceipt(){
-const actual=elapsedSeconds()/60,estimate=Number(state.estimated||0),diff=actual-estimate;
-const canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1920;const ctx=canvas.getContext("2d");ctx.textBaseline="top";
-ctx.fillStyle="#0d0d0d";ctx.fillRect(0,0,1080,1920);ctx.fillStyle="#dfff00";ctx.fillRect(0,0,1080,18);
-ctx.fillStyle="#f5f5f5";ctx.font="700 38px monospace";ctx.fillText("TIME IS RESPECT",72,105);ctx.fillStyle="#777";ctx.font="500 22px monospace";ctx.fillText("TIME RECEIPT / YOUR RESULT",72,155);
-ctx.fillStyle="#dfff00";ctx.font="700 150px monospace";ctx.fillText((diff>0?"+":"")+formatMinutes(diff),72,390);ctx.fillStyle="#f5f5f5";ctx.font="700 34px monospace";ctx.fillText("MIN",78,555);
-ctx.fillStyle="#cfcfcf";ctx.font="500 28px Prompt, sans-serif";ctx.fillText(diff>0?"ใช้เวลาจริงเกินที่คิดไว้":diff<0?"ใช้เวลาจริงน้อยกว่าที่คิด":"เวลาจริงตรงกับที่คิดไว้",72,635);ctx.fillStyle="#333";ctx.fillRect(72,710,936,2);
-const rows=[["YOUR ESTIMATE",formatMinutes(estimate)+" MIN"],["ACTUAL TIME",formatMinutes(actual)+" MIN"],["YOUR EXCUSE",state.excuse||"-"],["STATUS",diff>0?"LATE BY "+formatMinutes(diff)+" MIN":diff<0?"EARLY BY "+formatMinutes(Math.abs(diff))+" MIN":"ON TIME"]];
-let y=800;ctx.font="500 20px monospace";for(const [a,b] of rows){ctx.fillStyle="#666";ctx.fillText(a,72,y);ctx.fillStyle="#f5f5f5";ctx.font="700 28px monospace";ctx.fillText(b,72,y+42);ctx.font="500 20px monospace";y+=155}
-ctx.fillStyle="#777";ctx.font="500 23px Prompt, sans-serif";ctx.fillText("เวลาของคุณมีค่า เวลาของคนที่รอก็เหมือนกัน.",72,1510);ctx.fillStyle="#555";ctx.font="500 18px monospace";ctx.fillText("TIME IS RESPECT",72,1790);ctx.fillText("time-is-respect / share your result",72,1825);
-canvas.toBlob(async blob=>{if(!blob)return;const file=new File([blob],"time-is-respect-receipt.png",{type:"image/png"});if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:"TIME IS RESPECT",text:"My Time Receipt"});return}catch(e){if(e.name==="AbortError")return}}const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="time-is-respect-receipt.png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},"image/png");
+if(!state.completed||state.actualMinutes==null)return;
+if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+const actual=Number(state.actualMinutes),estimate=Number(state.estimated||0),diff=actual-estimate;
+const absDiff=formatMinutes(Math.abs(diff));
+const status=diff>0?"LATE BY "+absDiff+" MIN":diff<0?"EARLY BY "+absDiff+" MIN":"ON TIME";
+const canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1920;
+const ctx=canvas.getContext("2d");ctx.textBaseline="top";
+ctx.fillStyle="#0d0d0d";ctx.fillRect(0,0,1080,1920);
+ctx.fillStyle="#dfff00";ctx.fillRect(0,0,1080,18);
+ctx.fillStyle="#f5f5f5";ctx.font="700 38px 'IBM Plex Mono',monospace";ctx.fillText("TIME IS RESPECT",72,88);
+ctx.fillStyle="#777";ctx.font="500 20px 'IBM Plex Mono',monospace";ctx.fillText("TIME RECEIPT / YOUR RESULT",72,143);
+ctx.strokeStyle="#303030";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(72,205);ctx.lineTo(1008,205);ctx.stroke();
+ctx.fillStyle=diff>0?"#ff5d5d":"#dfff00";ctx.font="700 148px 'IBM Plex Mono',monospace";ctx.fillText((diff>0?"+":"")+formatMinutes(diff),72,315);
+ctx.fillStyle="#f5f5f5";ctx.font="700 34px 'IBM Plex Mono',monospace";ctx.fillText("MIN",78,482);
+ctx.fillStyle="#cfcfcf";ctx.font="500 28px Prompt,sans-serif";ctx.fillText(diff>0?"ใช้เวลาจริงเกินที่คิดไว้":diff<0?"ใช้เวลาจริงน้อยกว่าที่คิด":"เวลาจริงตรงกับที่คิดไว้",72,555);
+ctx.fillStyle="#dfff00";ctx.font="700 22px 'IBM Plex Mono',monospace";ctx.fillText(status,72,650);
+ctx.fillStyle="#242424";ctx.fillRect(72,718,936,2);
+const rows=[["YOUR ESTIMATE",formatMinutes(estimate)+" MIN"],["ACTUAL TIME",formatMinutes(actual)+" MIN"],["YOUR EXCUSE",state.excuse||"-"],["STATUS",status]];
+let y=785;
+for(const [a,b] of rows){
+ctx.fillStyle="#666";ctx.font="500 18px 'IBM Plex Mono',monospace";ctx.fillText(a,72,y);
+ctx.fillStyle="#f5f5f5";ctx.font="700 27px 'IBM Plex Mono',monospace";ctx.fillText(b,72,y+35);
+y+=142;
+}
+const progressX=72,progressY=1395,progressW=936,progressH=12;
+ctx.fillStyle="#242424";ctx.fillRect(progressX,progressY,progressW,progressH);
+ctx.fillStyle="#dfff00";ctx.fillRect(progressX,progressY,Math.min(progressW,(actual/Math.max(estimate,.1))*progressW),progressH);
+ctx.fillStyle="#777";ctx.font="500 21px Prompt,sans-serif";ctx.fillText("เวลาของคุณมีค่า เวลาของคนที่รอก็เหมือนกัน.",72,1510);
+ctx.fillStyle="#555";ctx.font="500 17px 'IBM Plex Mono',monospace";ctx.fillText("TIME IS RESPECT",72,1785);
+ctx.fillText("time-is-respect",72,1820);
+ctx.fillText("YOUR TIME / YOUR TRUTH",72,1855);
+canvas.toBlob(async blob=>{
+if(!blob)return;
+const file=new File([blob],"time-is-respect-receipt.png",{type:"image/png"});
+if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+try{await navigator.share({files:[file],title:"TIME IS RESPECT",text:"My Time Receipt"});return}catch(e){if(e.name==="AbortError")return}
+}
+const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="time-is-respect-receipt.png";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+},"image/png");
 }
