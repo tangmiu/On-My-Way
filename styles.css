@@ -14,3 +14,74 @@ h1{font-size:clamp(68px,12vw,150px);line-height:.87;margin:0 0 35px;font-weight:
 .timer-progress{height:3px;background:#242424;margin:26px 8% 0;overflow:hidden}.timer-progress div{height:100%;width:0;background:var(--accent);transition:width .5s linear}.time-stage.over .timer-progress div{background:var(--danger)}
 .time-stage.over{border-color:var(--danger)}.time-stage.over .timer{color:var(--danger)}.time-stage.over .timer-message{color:#fff}
 @media(max-width:750px){.timer-progress{margin-left:4%;margin-right:4%}}
+
+/* v2 UX polish */
+:root{--accent-soft:rgba(223,255,0,.08);--accent-line:rgba(223,255,0,.28)}
+::selection{background:var(--accent);color:#111}
+body{overflow-x:hidden}
+button{transition:transform .18s ease,border-color .18s ease,background .18s ease,color .18s ease,opacity .18s ease}
+button:active{transform:translateY(1px)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.intro{position:relative}
+.intro:before{content:"";position:absolute;right:-18vw;top:22%;width:48vw;height:48vw;border:1px solid rgba(223,255,0,.08);border-radius:50%;pointer-events:none}
+.intro:after{content:"";position:absolute;right:5%;top:38%;width:12px;height:12px;background:var(--accent);box-shadow:0 0 0 10px rgba(223,255,0,.05),0 0 35px rgba(223,255,0,.2);pointer-events:none}
+.scroll-cue{margin-top:24px;color:#555;font:500 10px/1 "IBM Plex Mono",monospace;letter-spacing:.12em;display:flex;align-items:center;gap:9px}
+.scroll-cue span{width:22px;height:1px;background:#555;display:block}
+.experience{position:relative}
+.experience:before,.dashboard:before{content:"";display:block;height:1px;background:linear-gradient(90deg,var(--accent-line),transparent);margin-bottom:45px}
+.experience-card{position:relative}
+.experience-card:after{content:"";position:absolute;right:0;top:42px;width:5px;height:5px;background:#333}
+.experience-card:hover:after{background:var(--accent)}
+.excuse-btn{position:relative;min-height:54px;overflow:hidden}
+.excuse-btn:before{content:"";position:absolute;inset:0;background:var(--accent);transform:translateY(101%);transition:transform .18s ease;z-index:0}
+.excuse-btn:hover:before{transform:translateY(0)}
+.excuse-btn>*{position:relative;z-index:1}
+.excuse-btn{isolation:isolate}
+.excuse-btn:hover{color:#111;border-color:var(--accent)}
+.excuse-btn.selected{box-shadow:inset 4px 0 #111}
+.estimate-input-wrap{transition:border-color .2s ease}
+.estimate-input-wrap:focus-within{border-color:var(--accent)}
+.hint{font-family:"IBM Plex Mono",monospace;font-size:11px}
+.time-stage{box-shadow:inset 0 0 0 1px rgba(255,255,255,.015)}
+.time-stage.running:after{content:"";position:absolute;top:0;left:0;width:100%;height:1px;background:var(--accent);animation:scan 2s linear infinite}
+.time-stage.over:after{background:var(--danger)}
+.time-stage.complete{border-color:#555}
+.timer-message{transition:color .2s ease}
+.timer-progress{position:relative}
+.timer-progress:after{content:"";position:absolute;top:0;right:0;width:1px;height:100%;background:#444}
+.result-box{position:relative;overflow:hidden}
+.result-box:before{content:"03 / YOUR RECEIPT";position:absolute;right:28px;top:28px;color:#444;font:500 10px "IBM Plex Mono",monospace;letter-spacing:.1em}
+.receipt-number{letter-spacing:-.06em}
+.receipt-meta>div{transition:background .18s ease}
+.receipt-meta>div:hover{background:#1a1a1a}
+.share-btn{min-height:54px;letter-spacing:.02em}
+.reset-btn:hover{border-color:#666;color:#ddd}
+.dashboard{position:relative}
+.stat{background:linear-gradient(145deg,#151515,#111);transition:transform .2s ease,border-color .2s ease}
+.stat:hover{transform:translateY(-2px);border-color:#4a4a4a}
+.stat-large .stat-value{font-size:clamp(34px,4vw,52px)}
+.truth-panel{position:relative;overflow:hidden}
+.truth-panel:after{content:"";position:absolute;right:-50px;bottom:-80px;width:220px;height:220px;border:1px solid rgba(223,255,0,.09);border-radius:50%}
+.excuse-list{max-width:760px}
+.stat-row{transition:padding .18s ease,background .18s ease}
+.stat-row:hover{padding-left:10px;padding-right:10px;background:#111}
+.closing{position:relative}
+.closing h2 span{display:inline-block}
+@keyframes scan{0%{transform:translateX(-100%);opacity:0}15%{opacity:1}85%{opacity:1}100%{transform:translateX(100%);opacity:0}}
+@media(max-width:750px){
+  .status-strip{font-size:9px;padding:7px 14px}
+  .brand{font-size:12px}
+  .intro:before{right:-35vw;top:28%;width:80vw;height:80vw}
+  .intro:after{right:9%;top:45%}
+  .scroll-cue{margin-top:18px}
+  .experience:before,.dashboard:before{margin-bottom:30px}
+  .experience-card:after{top:30px}
+  .excuse-btn{min-height:50px;font-size:12px}
+  .time-stage{padding:24px 12px 22px}
+  .stage-top{font-size:9px}
+  .timer{margin:30px 0 10px}
+  .result-box{padding:28px 20px}
+  .result-box:before{position:static;display:block;margin-bottom:22px}
+  .receipt-number{font-size:56px}
+  .share-btn{font-size:11px}
+}
