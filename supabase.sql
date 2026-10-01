@@ -50,6 +50,7 @@ as $$
     'people', count(*),
     'total_minutes', coalesce(round(sum(actual_minutes)::numeric, 1), 0),
     'average_minutes', coalesce(round(avg(actual_minutes)::numeric, 1), 0),
+    'average_estimated_minutes', coalesce(round(avg(estimated_minutes)::numeric, 1), 0),
     'median_minutes', coalesce(round(percentile_cont(0.5) within group (order by actual_minutes)::numeric, 1), 0),
     'average_gap', coalesce(round(avg(abs(actual_minutes - estimated_minutes))::numeric, 1), 0),
     'excuses',
