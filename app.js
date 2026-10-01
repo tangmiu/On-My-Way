@@ -24,13 +24,13 @@ async function init(){$("#beginBtn").addEventListener("click",startExperience);$
 init();
 async function shareReceipt(){
 const actual=elapsedSeconds()/60,estimate=Number(state.estimated||0),diff=actual-estimate;
-const canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1920;const ctx=canvas.getContext("2d");
+const canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1920;const ctx=canvas.getContext("2d");ctx.textBaseline="top";
 ctx.fillStyle="#0d0d0d";ctx.fillRect(0,0,1080,1920);ctx.fillStyle="#dfff00";ctx.fillRect(0,0,1080,18);
 ctx.fillStyle="#f5f5f5";ctx.font="700 38px monospace";ctx.fillText("TIME IS RESPECT",72,105);ctx.fillStyle="#777";ctx.font="500 22px monospace";ctx.fillText("TIME RECEIPT / YOUR RESULT",72,155);
-ctx.fillStyle="#dfff00";ctx.font="700 150px monospace";ctx.fillText((diff>0?"+":"")+formatMinutes(diff),72,430);ctx.fillStyle="#f5f5f5";ctx.font="700 34px monospace";ctx.fillText("MIN",78,490);
-ctx.fillStyle="#cfcfcf";ctx.font="500 28px Prompt, sans-serif";ctx.fillText(diff>0?"ใช้เวลาจริงเกินที่คิดไว้":"เวลาจริงใกล้เคียงกับที่คาด",72,575);ctx.fillStyle="#333";ctx.fillRect(72,650,936,2);
+ctx.fillStyle="#dfff00";ctx.font="700 150px monospace";ctx.fillText((diff>0?"+":"")+formatMinutes(diff),72,390);ctx.fillStyle="#f5f5f5";ctx.font="700 34px monospace";ctx.fillText("MIN",78,555);
+ctx.fillStyle="#cfcfcf";ctx.font="500 28px Prompt, sans-serif";ctx.fillText(diff>0?"ใช้เวลาจริงเกินที่คิดไว้":diff<0?"ใช้เวลาจริงน้อยกว่าที่คิด":"เวลาจริงตรงกับที่คิดไว้",72,635);ctx.fillStyle="#333";ctx.fillRect(72,710,936,2);
 const rows=[["YOUR ESTIMATE",formatMinutes(estimate)+" MIN"],["ACTUAL TIME",formatMinutes(actual)+" MIN"],["YOUR EXCUSE",state.excuse||"-"],["STATUS",diff>0?"LATE BY "+formatMinutes(diff)+" MIN":diff<0?"EARLY BY "+formatMinutes(Math.abs(diff))+" MIN":"ON TIME"]];
-let y=740;ctx.font="500 20px monospace";for(const [a,b] of rows){ctx.fillStyle="#666";ctx.fillText(a,72,y);ctx.fillStyle="#f5f5f5";ctx.font="700 28px monospace";ctx.fillText(b,72,y+42);ctx.font="500 20px monospace";y+=155}
-ctx.fillStyle="#777";ctx.font="500 23px Prompt, sans-serif";ctx.fillText("เวลาของคุณมีค่า เวลาของคนที่รอก็เหมือนกัน.",72,1500);ctx.fillStyle="#555";ctx.font="500 18px monospace";ctx.fillText("time-is-respect / share your result",72,1800);
+let y=800;ctx.font="500 20px monospace";for(const [a,b] of rows){ctx.fillStyle="#666";ctx.fillText(a,72,y);ctx.fillStyle="#f5f5f5";ctx.font="700 28px monospace";ctx.fillText(b,72,y+42);ctx.font="500 20px monospace";y+=155}
+ctx.fillStyle="#777";ctx.font="500 23px Prompt, sans-serif";ctx.fillText("เวลาของคุณมีค่า เวลาของคนที่รอก็เหมือนกัน.",72,1510);ctx.fillStyle="#555";ctx.font="500 18px monospace";ctx.fillText("TIME IS RESPECT",72,1790);ctx.fillText("time-is-respect / share your result",72,1825);
 canvas.toBlob(async blob=>{if(!blob)return;const file=new File([blob],"time-is-respect-receipt.png",{type:"image/png"});if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:"TIME IS RESPECT",text:"My Time Receipt"});return}catch(e){if(e.name==="AbortError")return}}const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="time-is-respect-receipt.png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},"image/png");
 }
