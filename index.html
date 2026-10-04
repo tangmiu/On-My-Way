@@ -76,7 +76,7 @@
 <div class="personality-stats">
 <div><span>ESTIMATE</span><strong id="personalityEstimate">—</strong><small>MIN</small></div>
 <div><span>ACTUAL</span><strong id="personalityActual">—</strong><small>MIN</small></div>
-<div><span>GAP</span><strong id="personalityGap">—</strong><small>MIN</small></div>
+<div><span>DIFFERENCE</span><strong id="personalityGap">—</strong><small>MIN · ACTUAL − ESTIMATE</small></div>
 </div>
 <div class="personality-tag" id="personalityTag">TIME IS RESPECT</div>
 <div class="personality-credit">BASE ON · แนวคิดและไอเดียโดย <strong>Tang Miu</strong></div>
@@ -86,13 +86,13 @@
 <button class="reset-btn result-reset" id="resultResetBtn">TRY AGAIN</button>
 </section>\n<section class="dashboard" id="dashboard">
 <div class="dashboard-head"><div><div class="eyebrow">LIVE DATA</div><h2>ความจริงของทุกคน</h2><p class="small">ข้อมูลรวมจากผู้เข้าร่วมทั้งหมด · อัปเดตอัตโนมัติ</p></div><div class="live-dot"><i></i> LIVE</div></div>
-<div class="data-story" id="dataStory"><div class="story-top"><span>THE REALITY CHECK</span><span id="storyLive">LIVE</span></div><div class="story-main"><div class="story-kicker">SO FAR, THE DATA SAYS</div><h3 id="storyHeadline">กำลังรอข้อมูลชุดแรก...</h3><p id="storySub">ทุกการกด “I’M HERE” จะทำให้ภาพนี้ชัดขึ้น</p></div><div class="story-metrics"><div><span>ESTIMATED</span><strong id="storyEstimated">—</strong><small>MIN AVG</small></div><div class="story-arrow">→</div><div><span>ACTUAL</span><strong id="storyActual">—</strong><small>MIN AVG</small></div><div class="story-gap"><span>GAP</span><strong id="storyGap">—</strong><small>MIN</small></div></div></div><div class="dashboard-grid">
+<div class="data-story" id="dataStory"><div class="story-top"><span>THE REALITY CHECK</span><span id="storyLive">LIVE</span></div><div class="story-main"><div class="story-kicker">SO FAR, THE DATA SAYS</div><h3 id="storyHeadline">กำลังรอข้อมูลชุดแรก...</h3><p id="storySub">ทุกการกด “I’M HERE” จะทำให้ภาพนี้ชัดขึ้น</p></div><div class="story-metrics"><div><span>ESTIMATED</span><strong id="storyEstimated">—</strong><small>MIN AVG</small></div><div class="story-arrow">→</div><div><span>ACTUAL</span><strong id="storyActual">—</strong><small>MIN AVG</small></div><div class="story-gap"><span>AVG ERROR</span><strong id="storyGap">—</strong><small>MIN · ABSOLUTE</small></div></div></div><div class="dashboard-grid">
 <div class="stat stat-large"><div class="stat-label">PEOPLE PARTICIPATED</div><div class="stat-value" id="peopleCount">—</div><div class="stat-label">คน</div></div>
 <div class="stat"><div class="stat-label">AVERAGE ACTUAL</div><div class="stat-value" id="avgCount">—</div><div class="stat-label">นาที</div></div>
 <div class="stat"><div class="stat-label">MEDIAN</div><div class="stat-value" id="medianCount">—</div><div class="stat-label">นาที</div></div>
 <div class="stat"><div class="stat-label">TOTAL TIME</div><div class="stat-value" id="waitTotal">—</div><div class="stat-label">นาที</div></div>
 </div>
-<div class="truth-panel"><div class="truth-kicker">THE TRUTH</div><div class="truth-number" id="gapCount">—</div><div class="truth-copy">นาทีคือค่าเฉลี่ยของเวลาที่คาดเคลื่อน<br>ระหว่าง “คิดว่าจะถึง” กับ “ถึงจริง”</div></div>
+<div class="truth-panel"><div class="truth-kicker">THE TRUTH</div><div class="truth-number" id="gapCount">—</div><div class="truth-copy">นาทีคือค่าเฉลี่ยของความคลาดเคลื่อนแบบสัมบูรณ์<br>ระหว่าง “คิดว่าจะถึง” กับ “ถึงจริง”</div></div>
 <div class="excuse-list" id="excuseList"></div>
 <div class="dashboard-note" id="dashboardNote">กำลังโหลดข้อมูล...</div><div class="you-vs-everyone hidden" id="youVsEveryone"><div class="compare-top"><span>YOU VS EVERYONE</span><span id="compareStatus">YOUR RESULT</span></div><div class="compare-grid"><div><span>YOU</span><strong id="yourActual">—</strong><small>MIN ACTUAL</small></div><div class="compare-arrow">VS</div><div><span>EVERYONE</span><strong id="everyoneActual">—</strong><small>MIN AVG</small></div></div><div class="compare-message" id="compareMessage">—</div></div>
 </section>
