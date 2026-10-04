@@ -84,7 +84,23 @@
 <button class="share-btn result-share" id="resultShareBtn">SHARE / SAVE TO STORY <span>↗</span></button>
 <button class="result-dashboard-btn" id="resultDashboardBtn">SEE EVERYONE'S DATA <span>↘</span></button>
 <button class="reset-btn result-reset" id="resultResetBtn">TRY AGAIN</button>
-</section>\n<section class="dashboard" id="dashboard">
+</section>\n<section class="reality-planner" id="realityPlanner">
+<div class="planner-head"><div><div class="eyebrow">SIDE PROJECT · REALITY PLANNER</div><h2>ไม่มีเวลาเล่น?<br><span>คำนวณก่อนออก.</span></h2><p class="planner-intro">รู้เวลานัด รู้เวลาเดินทาง แล้วดูว่าเวลาที่ควรออกจริง ๆ คือเมื่อไหร่</p></div><div class="planner-mark">CALCULATE<br>THE REALITY</div></div>
+<div class="planner-card">
+<div class="planner-step"><span>01</span><div><div class="planner-label">YOUR APPOINTMENT</div><h3>ต้องไปถึงกี่โมง?</h3><input id="plannerMeeting" type="time" value="18:00" aria-label="เวลานัดหมาย"></div></div>
+<div class="planner-step"><span>02</span><div class="planner-grow"><div class="planner-label">TRAVEL TIME</div><h3>ปกติใช้เวลาเดินทางกี่นาที?</h3><div class="planner-presets" id="plannerTravelPresets"><button data-min="15">15 MIN</button><button data-min="30">30 MIN</button><button data-min="45">45 MIN</button><button data-min="60">60 MIN</button></div><div class="planner-custom"><input id="plannerTravel" type="number" min="1" max="360" value="30" inputmode="numeric"><span>MIN</span></div></div></div>
+<div class="planner-step"><span>03</span><div class="planner-grow"><div class="planner-label">TODAY'S CONDITION</div><h3>วันนี้ควรเผื่อเวลาแค่ไหน?</h3><div class="planner-presets planner-buffer" id="plannerBufferPresets"><button data-buffer="5">ปกติ <small>+5</small></button><button data-buffer="10">รถเยอะ <small>+10</small></button><button data-buffer="15">เร่งด่วน <small>+15</small></button><button data-buffer="20">ฝนตก <small>+20</small></button></div></div></div>
+<button class="planner-calc" id="plannerCalculate">CALCULATE MY REALITY <span>↘</span></button>
+</div>
+<div class="planner-result hidden" id="plannerResult">
+<div class="planner-result-top"><span>TIME RECEIPT · BEFORE YOU GO</span><span>REALITY PLANNER</span></div>
+<div class="planner-result-main"><div class="planner-result-label">YOU SHOULD LEAVE AT</div><div class="planner-leave" id="plannerLeave">17:10</div><p id="plannerResultCopy">นัด 18:00 · เดินทาง 30 นาที · เผื่อ 20 นาที</p></div>
+<div class="planner-breakdown"><div><span>APPOINTMENT</span><strong id="plannerOutMeeting">18:00</strong></div><div><span>TRAVEL</span><strong id="plannerOutTravel">30 MIN</strong></div><div><span>BUFFER</span><strong id="plannerOutBuffer">20 MIN</strong></div><div class="planner-total"><span>TOTAL TIME NEEDED</span><strong id="plannerOutTotal">50 MIN</strong></div></div>
+<div class="planner-warning" id="plannerWarning">ถ้าออกช้ากว่านี้ 10 นาที คุณจะเหลือเวลาเผื่อความผิดพลาดน้อยลง</div>
+<div class="planner-share-line">เวลาที่คุณคิดว่าจะใช้ ≠ เวลาที่คุณควรเผื่อไว้</div>
+</div>
+</section>
+<section class="dashboard" id="dashboard">
 <div class="dashboard-head"><div><div class="eyebrow">LIVE DATA</div><h2>ความจริงของทุกคน</h2><p class="small">ข้อมูลรวมจากผู้เข้าร่วมทั้งหมด · อัปเดตอัตโนมัติ</p></div><div class="live-dot"><i></i> LIVE</div></div>
 <div class="data-story" id="dataStory"><div class="story-top"><span>THE REALITY CHECK</span><span id="storyLive">LIVE</span></div><div class="story-main"><div class="story-kicker">SO FAR, THE DATA SAYS</div><h3 id="storyHeadline">กำลังรอข้อมูลชุดแรก...</h3><p id="storySub">ทุกการกด “I’M HERE” จะทำให้ภาพนี้ชัดขึ้น</p></div><div class="story-metrics"><div><span>กะเวลาเฉลี่ย</span><strong id="storyEstimated">—</strong><small>นาที</small></div><div class="story-arrow">→</div><div><span>เวลาจริงเฉลี่ย</span><strong id="storyActual">—</strong><small>นาที</small></div><div class="story-gap"><span>ต่างจากที่คิด</span><strong id="storyGap">—</strong><small>นาที · เฉลี่ย</small></div></div></div><div class="dashboard-grid">
 <div class="stat stat-large"><div class="stat-label">PEOPLE PARTICIPATED</div><div class="stat-value" id="peopleCount">—</div><div class="stat-label">คน</div></div>
