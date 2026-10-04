@@ -29,9 +29,9 @@ async function init(){
  on("#resultDashboardBtn","click",()=>$("#dashboard")?.scrollIntoView({behavior:"smooth"}));
  on("#shareBtn","click",shareReceipt);
  on("#resultShareBtn","click",shareReceipt);
- $(".excuse-btn").forEach(btn=>btn.addEventListener("click",()=>{
+ $$(".excuse-btn").forEach(btn=>btn.addEventListener("click",()=>{
    if(state.startedAt)return;
-   $(".excuse-btn").forEach(b=>b.classList.remove("selected"));
+    $$(".excuse-btn").forEach(b=>b.classList.remove("selected"));
    btn.classList.add("selected");
    state.customExcuse=btn.id==="otherExcuseBtn";
    if(state.customExcuse){
