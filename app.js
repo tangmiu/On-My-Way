@@ -129,7 +129,7 @@ function makeReceiptCanvas(){
  drawCharacter(p.tone);
  const portraitShade=ctx.createLinearGradient(0,180,0,850);portraitShade.addColorStop(0,"rgba(255,255,255,.05)");portraitShade.addColorStop(.68,"rgba(255,245,230,0)");portraitShade.addColorStop(1,"rgba(80,55,45,.16)");ctx.fillStyle=portraitShade;ctx.fillRect(0,0,pw,ph);ctx.restore();
  tape(125,205,130,36,-.08);tape(920,214,120,34,.1);
- rr(365,810,350,54,27,"rgba(47,57,58,.80)");text(p.tag,540,825,"800 18px 'IBM Plex Mono',monospace"#FFF9EE","center");
+  rr(365,810,350,54,27,"rgba(47,57,58,.80)");text(p.tag,540,825,"800 18px 'IBM Plex Mono',monospace","#FFF9EE","center");
  rr(36,855,1008,850,40,t.paper,"rgba(73,58,49,.10)");
  tape(110,870,125,34,-.12);tape(970,873,115,32,.1);
  text("YOUR TIME PERSONALITY",82,910,"700 20px 'IBM Plex Mono',monospace","#76685F");
