@@ -23,8 +23,11 @@ function startRun(){const estimate=Number($("#estimatedInput").value);if(state.c
 async function init(){$("#beginBtn").addEventListener("click",startExperience);$("#dashboardBtn").addEventListener("click",()=>$("#dashboard").scrollIntoView({behavior:"smooth"}));$("#resetBtn").addEventListener("click",resetRun);$("#resultResetBtn").addEventListener("click",resetRun);$("#resultDashboardBtn").addEventListener("click",()=>$("#dashboard").scrollIntoView({behavior:"smooth"}));$("#shareBtn").addEventListener("click",shareReceipt);$("#resultShareBtn").addEventListener("click",shareReceipt);$$(".excuse-btn").forEach(btn=>btn.addEventListener("click",()=>{if(state.startedAt)return;$$(".excuse-btn").forEach(b=>b.classList.remove("selected"));btn.classList.add("selected");state.customExcuse=btn.id==="otherExcuseBtn";if(state.customExcuse){$("#customExcuseWrap").classList.remove("hidden");$("#customExcuse").focus();state.excuse=$("#customExcuse").value.trim()||null}else{$("#customExcuseWrap").classList.add("hidden");$("#customExcuse").value="";state.excuse=btn.dataset.excuse}}));$("#customExcuse").addEventListener("input",e=>{if(state.customExcuse)state.excuse=e.target.value.trim()});$("#startBtn").addEventListener("click",startRun);$("#finishBtn").addEventListener("click",finishRun);document.addEventListener("visibilitychange",()=>{if(state.startedAt)renderTimer()});if(state.demo){showStatus("DEMO MODE · ยังไม่ได้เชื่อม Supabase","demo")}else{const{createClient}=window.supabase;state.supabase=createClient(config.url,config.anonKey);showStatus("SYSTEM · LIVE DATABASE CONNECTED")}await fetchStats();if(!state.demo){try{state.supabase.channel("sessions-live").on("postgres_changes",{event:"INSERT",schema:"public",table:"sessions"},fetchStats).subscribe()}catch(e){console.warn("Realtime subscription unavailable",e)}setInterval(fetchStats,15000)}}
 init();
 
-const shareCharacterSprite="https://raw.githubusercontent.com/tangmiu/Time-Is-Respect/main/assets/share-characters.webp";
-const shareCharacterImage=new Image();shareCharacterImage.src=shareCharacterSprite;
+const shareCharacterImages={early:new Image(),ontime:new Image(),near:new Image(),late:new Image()};
+shareCharacterImages.early.src="assets/share-early.jpg";
+shareCharacterImages.ontime.src="assets/share-ontime.jpg";
+shareCharacterImages.near.src="assets/share-near.jpg";
+shareCharacterImages.late.src="assets/share-late.jpg";const shareCharacterImage=new Image();shareCharacterImage.src=shareCharacterSprite;
 function makeReceiptCanvas(){
  const p=getPersonality(),actual=Number(state.actualMinutes||0),estimate=Number(state.estimated||0),diff=actual-estimate;
  const canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1920;
@@ -43,7 +46,7 @@ function makeReceiptCanvas(){
  const wrap=(v,max,font)=>{ctx.font=font;const words=String(v||"").split(/\s+/),out=[];let z="";for(const word of words){const n=z?z+" "+word:word;if(ctx.measureText(n).width>max&&z){out.push(z);z=word}else z=n}if(z)out.push(z);return out};
 
  // Detailed illustrated character: deliberately hand-drawn/semi-realistic, not a minimal icon.
- const drawCharacter=(tone)=>{const img=shareCharacterImage;const idx=tone==="early"?0:tone==="ontime"?1:tone==="near"?2:3;ctx.save();ctx.beginPath();ctx.roundRect(42,190,996,850,26);ctx.clip();if(img.complete&&img.naturalWidth){ctx.drawImage(img,idx*240,0,240,100,42,190,996,850)}else{ctx.fillStyle=t.soft;ctx.fillRect(42,190,996,850)}ctx.restore();};
+ const drawCharacter=(tone)=>{const img=shareCharacterImages[tone]||shareCharacterImages.ontime;ctx.save();ctx.beginPath();ctx.roundRect(42,190,996,850,26);ctx.clip();if(img.complete&&img.naturalWidth){ctx.drawImage(img,42,190,996,850)}else{ctx.fillStyle=t.soft;ctx.fillRect(42,190,996,850)}ctx.restore();};
 
  ctx.fillStyle=t.bg;ctx.fillRect(0,0,1080,1920);
  const bg=ctx.createLinearGradient(0,0,0,1920);bg.addColorStop(0,"rgba(255,255,255,.52)");bg.addColorStop(.58,"rgba(255,248,235,.08)");bg.addColorStop(1,"rgba(255,255,255,.5)");ctx.fillStyle=bg;ctx.fillRect(0,0,1080,1920);
