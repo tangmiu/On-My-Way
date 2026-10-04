@@ -41,7 +41,7 @@ function calculatePlanner(){
 function initPlanner(){
  $("#plannerTravelPresets button").forEach(btn=>btn.addEventListener("click",()=>{ $("#plannerTravel").value=btn.dataset.min; updatePlannerSelection("#plannerTravelPresets","min",btn.dataset.min)}));
  $("#plannerBufferPresets button").forEach(btn=>btn.addEventListener("click",()=>updatePlannerSelection("#plannerBufferPresets","buffer",btn.dataset.buffer)));
- $("#plannerTravel").addEventListener("input",()=> $("#plannerTravelPresets button").forEach(b=>b.classList.remove("selected")));
+ $("#plannerTravel").addEventListener("input",()=> $ ("#plannerTravelPresets button").forEach(b=>b.classList.remove("selected")));
  $("#plannerCalculate").addEventListener("click",calculatePlanner);
  updatePlannerSelection("#plannerTravelPresets","min",30);
  updatePlannerSelection("#plannerBufferPresets","buffer",5);
