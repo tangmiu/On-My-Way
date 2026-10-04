@@ -26,92 +26,143 @@ function makeReceiptCanvas(){
  const p=getPersonality(),actual=Number(state.actualMinutes),estimate=Number(state.estimated||0),diff=actual-estimate;
  const canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1920;
  const ctx=canvas.getContext("2d");ctx.textBaseline="top";
- const bg=p.tone==="early"?"#E4F2E6":p.tone==="ontime"?"#DDF2F6":p.tone==="near"?"#FFF0C7":"#FBE2E7";
- const accent=p.tone==="early"?"#76C58A":p.tone==="ontime"?"#65BFD4":p.tone==="near"?"#E5B84E":"#E88391";
- const brown="#4A3930",muted="#806D5F",cream="#FFF8EA",line="#D8C8B3",left=72,width=936;
- const round=(x,y,w,h,r,fill)=>{ctx.fillStyle=fill;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()};
- const circle=(x,y,r,fill)=>{ctx.fillStyle=fill;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()};
- const wrap=(text,maxWidth)=>{const chars=Array.from(String(text||"")),lines=[];let line="";for(const ch of chars){const test=line+ch;if(ctx.measureText(test).width>maxWidth&&line){lines.push(line);line=ch}else line=test}if(line)lines.push(line);return lines};
- ctx.fillStyle=bg;ctx.fillRect(0,0,1080,1920);
- ctx.fillStyle=accent;ctx.fillRect(0,0,1080,18);
- ctx.fillStyle=brown;ctx.font="700 34px 'IBM Plex Mono',monospace";ctx.fillText("TIME IS RESPECT",left,70);
- ctx.fillStyle=muted;ctx.font="500 18px 'IBM Plex Mono',monospace";ctx.fillText("YOUR TIME PERSONALITY",left,116);
- ctx.fillStyle=line;ctx.fillRect(left,160,left+width-left,2);
+ const palettes={
+   early:{bg:"#E7F3E8",paper:"#FFF9EE",accent:"#79C98D",soft:"#CFE9D4",hair:"#D9B08C",jacket:"#7BAE8C",skin:"#F1C5B4",ink:"#3E4940"},
+   ontime:{bg:"#E2F3F7",paper:"#FFF9EE",accent:"#67BED2",soft:"#CDEAF0",hair:"#5D514F",jacket:"#8EB9C6",skin:"#F2C7B8",ink:"#3C4B50"},
+   near:{bg:"#FFF1D2",paper:"#FFF9EE",accent:"#E6B95B",soft:"#F7DFAD",hair:"#6A5046",jacket:"#D49A72",skin:"#F1C3AF",ink:"#51443A"},
+   late:{bg:"#F8E3E8",paper:"#FFF9EE",accent:"#E48594",soft:"#F2C8D0",hair:"#4B4650",jacket:"#A47D91",skin:"#F0C2B4",ink:"#4B3F46"}
+ };
+ const c=palettes[p.tone]||palettes.ontime;
+ const left=64,width=952;
+ const round=(x,y,w,h,r,fill,stroke)=>{ctx.fillStyle=fill;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke()}};
+ const circle=(x,y,r,fill,stroke)=>{ctx.fillStyle=fill;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke()}};
+ const line=(x1,y1,x2,y2,color,w=3)=>{ctx.strokeStyle=color;ctx.lineWidth=w;ctx.lineCap="round";ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()};
+ const text=(value,x,y,font,fill,align="left")=>{ctx.fillStyle=fill;ctx.font=font;ctx.textAlign=align;ctx.fillText(String(value||""),x,y);ctx.textAlign="left"};
+ const wrap=(value,maxWidth,font)=>{ctx.font=font;const words=String(value||"").split(/\s+/),lines=[];let current="";for(const word of words){const test=current?current+" "+word:word;if(ctx.measureText(test).width>maxWidth&&current){lines.push(current);current=word}else current=test}if(current)lines.push(current);return lines};
+ const rr=(x,y,w,h,r,fill)=>round(x,y,w,h,r,fill);
+ const drawStar=(x,y,s,color)=>{ctx.fillStyle=color;ctx.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,r=i%2?s:s*.42;const px=x+Math.cos(a)*r,py=y+Math.sin(a)*r;i?ctx.lineTo(px,py):ctx.moveTo(px,py)}ctx.closePath();ctx.fill()};
+ const drawClock=(x,y,r,color)=>{circle(x,y,r,"rgba(255,255,255,.65)",color);line(x,y,x,y-r*.48,color,4);line(x,y,x+r*.34,y+r*.18,color,4);circle(x,y,5,color)};
 
- // ART CARD — intentionally kept separate from the working share logic below.
- round(left,195,width,720,46,cream);
- ctx.save();ctx.globalAlpha=.48;circle(850,300,150,accent);circle(175,805,125,"#FFFFFF");ctx.globalAlpha=1;
- ctx.strokeStyle=accent;ctx.lineWidth=4;ctx.beginPath();ctx.arc(825,320,112,.25,Math.PI*1.6);ctx.stroke();
- ctx.strokeStyle="#D8C8B3";ctx.lineWidth=3;ctx.beginPath();ctx.arc(825,320,92,-.55,.8);ctx.stroke();ctx.restore();
+ // Soft paper / editorial background.
+ ctx.fillStyle=c.bg;ctx.fillRect(0,0,1080,1920);
+ const g=ctx.createLinearGradient(0,0,1080,1920);g.addColorStop(0,"rgba(255,255,255,.42)");g.addColorStop(.5,"rgba(255,248,234,.08)");g.addColorStop(1,"rgba(255,255,255,.3)");ctx.fillStyle=g;ctx.fillRect(0,0,1080,1920);
+ ctx.globalAlpha=.65;circle(120,260,170,c.soft);circle(955,520,190,c.soft);circle(930,1690,210,c.soft);ctx.globalAlpha=1;
 
- // Decorative sparkles.
- const sparkle=(x,y,s)=>{ctx.fillStyle=accent;ctx.beginPath();ctx.moveTo(x,y-s);ctx.lineTo(x+5,y-5);ctx.lineTo(x+s,y);ctx.lineTo(x+5,y+5);ctx.lineTo(x,y+s);ctx.lineTo(x-5,y+5);ctx.lineTo(x-s,y);ctx.lineTo(x-5,y-5);ctx.closePath();ctx.fill()};
- sparkle(170,310,15);sparkle(890,470,11);sparkle(155,690,9);
+ // Header: deliberately sparse.
+ text("TIME IS RESPECT",left,62,"800 34px 'IBM Plex Mono',monospace",c.ink);
+ text("YOUR TIME PERSONALITY",left,108,"600 18px 'IBM Plex Mono',monospace","#7A6A5D");
+ line(left,150,left+width,150,"rgba(74,57,48,.18)",2);
 
- // Refined cute male character.
- const cx=530;
- // shadow
- ctx.fillStyle="#D8C8B3";ctx.beginPath();ctx.ellipse(cx,850,175,24,0,0,Math.PI*2);ctx.fill();
- // legs / trousers
- ctx.fillStyle="#66758B";ctx.beginPath();ctx.moveTo(cx-105,760);ctx.lineTo(cx-18,760);ctx.lineTo(cx-28,850);ctx.lineTo(cx-108,850);ctx.closePath();ctx.fill();
- ctx.beginPath();ctx.moveTo(cx+18,760);ctx.lineTo(cx+105,760);ctx.lineTo(cx+108,850);ctx.lineTo(cx+28,850);ctx.closePath();ctx.fill();
- // shoes
- round(cx-122,835,98,27,14,"#4A3930");round(cx+24,835,98,27,14,"#4A3930");
- // body / jacket
- round(cx-150,570,300,230,70,"#8EA3B8");
- round(cx-92,590,184,195,48,"#AFC1D1");
- // shirt and collar
- ctx.fillStyle="#FFF8EA";ctx.beginPath();ctx.moveTo(cx-44,585);ctx.lineTo(cx,630);ctx.lineTo(cx+44,585);ctx.lineTo(cx+32,760);ctx.lineTo(cx-32,760);ctx.closePath();ctx.fill();
- ctx.strokeStyle="#7B8FA5";ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(cx-44,585);ctx.lineTo(cx,630);ctx.lineTo(cx+44,585);ctx.stroke();
- // arms
- round(cx-184,600,64,185,30,"#8EA3B8");round(cx+120,600,64,185,30,"#8EA3B8");
- // hands
- circle(cx-151,785,27,"#F2C5B2");circle(cx+151,785,27,"#F2C5B2");
- // neck
- round(cx-39,505,78,95,25,"#F2C5B2");
- // ears
- circle(cx-111,405,27,"#F2C5B2");circle(cx+111,405,27,"#F2C5B2");
- // face
- ctx.fillStyle="#F4C8B6";ctx.beginPath();ctx.moveTo(cx-105,325);ctx.quadraticCurveTo(cx-118,455,cx,520);ctx.quadraticCurveTo(cx+118,455,cx+105,325);ctx.quadraticCurveTo(cx,250,cx-105,325);ctx.closePath();ctx.fill();
- // hair silhouette
- ctx.fillStyle="#4C403D";ctx.beginPath();ctx.moveTo(cx-120,370);ctx.quadraticCurveTo(cx-130,255,cx-42,225);ctx.quadraticCurveTo(cx+65,188,cx+128,275);ctx.quadraticCurveTo(cx+100,280,cx+70,268);ctx.quadraticCurveTo(cx+95,305,cx+83,350);ctx.lineTo(cx+45,320);ctx.quadraticCurveTo(cx+30,285,cx+5,265);ctx.quadraticCurveTo(cx-32,330,cx-95,345);ctx.lineTo(cx-120,370);ctx.closePath();ctx.fill();
- // hair highlights
- ctx.strokeStyle="#74625D";ctx.lineWidth=10;ctx.lineCap="round";ctx.beginPath();ctx.moveTo(cx-65,265);ctx.quadraticCurveTo(cx-35,225,cx+8,220);ctx.moveTo(cx+28,224);ctx.quadraticCurveTo(cx+72,230,cx+96,267);ctx.stroke();
- // glasses
- ctx.strokeStyle=brown;ctx.lineWidth=7;round(cx-91,365,78,52,18,"#F7EEE2");round(cx+13,365,78,52,18,"#F7EEE2");
- ctx.strokeStyle=brown;ctx.strokeRect(cx-91,365,78,52);ctx.strokeRect(cx+13,365,78,52);ctx.beginPath();ctx.moveTo(cx-13,389);ctx.lineTo(cx+13,389);ctx.stroke();
- // eyes / brows
- ctx.fillStyle=brown;ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(cx-72,350);ctx.lineTo(cx-31,345);ctx.moveTo(cx+31,345);ctx.lineTo(cx+72,350);ctx.stroke();
- circle(cx-52,391,7,brown);circle(cx+52,391,7,brown);
- // nose / smile
- ctx.strokeStyle="#B86F68";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(cx,405);ctx.lineTo(cx-6,430);ctx.lineTo(cx+8,432);ctx.stroke();
- ctx.strokeStyle="#A85F67";ctx.lineWidth=5;ctx.beginPath();ctx.arc(cx,445,25,.15,Math.PI-.15);ctx.stroke();
- // headphones
- ctx.strokeStyle="#6B788A";ctx.lineWidth=18;ctx.beginPath();ctx.arc(cx,345,126,Math.PI*1.05,Math.PI*1.95);ctx.stroke();
- circle(cx-125,360,24,"#6B788A");circle(cx+125,360,24,"#6B788A");
- // tiny clock pin
- circle(cx+72,642,25,cream);ctx.strokeStyle=accent;ctx.lineWidth=5;ctx.beginPath();ctx.arc(cx+72,642,17,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(cx+72,642);ctx.lineTo(cx+72,630);ctx.moveTo(cx+72,642);ctx.lineTo(cx+82,648);ctx.stroke();
- // small art caption
- ctx.fillStyle=brown;ctx.font="700 20px 'IBM Plex Mono',monospace";ctx.fillText("TIME ≠ LATE",left+42,865);
- ctx.fillStyle=muted;ctx.font="500 17px 'IBM Plex Mono',monospace";ctx.fillText("a little portrait of your timing",left+42,890);
+ // Main illustration frame.
+ rr(left,188,width,640,42,c.paper,"rgba(74,57,48,.10)");
+ ctx.save();
+ ctx.globalAlpha=.5;circle(170,700,150,c.soft);circle(880,285,140,c.soft);ctx.globalAlpha=1;
+ drawStar(170,300,18,c.accent);drawStar(905,690,14,c.accent);
+ ctx.restore();
 
- // Minimal result block.
- round(left,955,width,515,42,cream);
- ctx.fillStyle=accent;ctx.font="700 22px 'IBM Plex Mono',monospace";ctx.fillText(p.tag,left+44,1005);
- ctx.fillStyle=brown;ctx.font="800 82px Prompt,sans-serif";ctx.fillText(p.name,left+44,1050);
- ctx.fillStyle="#705C4E";ctx.font="500 27px Prompt,sans-serif";
- const descLines=wrap(p.desc,820);let dy=1150;for(const l of descLines.slice(0,2)){ctx.fillText(l,left+44,dy);dy+=42}
- // Three clean metrics.
- const metricY=1265,metricW=260,gap=38;
- [["ESTIMATE",formatMinutes(estimate)+" MIN"],["ACTUAL",formatMinutes(actual)+" MIN"],["DIFFERENCE",(diff>0?"+":"")+formatMinutes(diff)+" MIN"]].forEach((v,i)=>{
-   const x=left+44+i*(metricW+gap);round(x,metricY,metricW,150,26,i===2?accent:bg);
-   ctx.fillStyle=muted;ctx.font="600 16px 'IBM Plex Mono',monospace";ctx.fillText(v[0],x+20,metricY+22);
-   ctx.fillStyle=brown;ctx.font="700 31px 'IBM Plex Mono',monospace";ctx.fillText(v[1],x+20,metricY+70);
+ // Character variants: each personality gets a distinct silhouette, outfit and mood.
+ const cx=540,ground=790;
+ ctx.fillStyle="rgba(74,57,48,.10)";ctx.beginPath();ctx.ellipse(cx,ground,180,24,0,0,Math.PI*2);ctx.fill();
+
+ if(p.tone==="early"){
+   // Energetic blond boy / varsity look.
+   ctx.fillStyle="#617A6A";ctx.beginPath();ctx.moveTo(cx-122,580);ctx.lineTo(cx+122,580);ctx.quadraticCurveTo(cx+170,665,cx+140,780);ctx.lineTo(cx-140,780);ctx.quadraticCurveTo(cx-170,665,cx-122,580);ctx.fill();
+   rr(cx-132,650,72,150,28,"#6E927A");rr(cx+60,650,72,150,28,"#6E927A");
+   ctx.fillStyle=c.skin;circle(cx-95,795,28,c.skin);circle(cx+95,795,28,c.skin);
+   ctx.fillStyle="#F6D4B6";ctx.fillRect(cx-38,500,76,105);
+   ctx.fillStyle=c.skin;ctx.beginPath();ctx.moveTo(cx-105,320);ctx.quadraticCurveTo(cx-115,460,cx,535);ctx.quadraticCurveTo(cx+115,460,cx+105,320);ctx.quadraticCurveTo(cx,245,cx-105,320);ctx.fill();
+   ctx.fillStyle=c.hair;ctx.beginPath();ctx.moveTo(cx-120,360);ctx.quadraticCurveTo(cx-110,230,cx,218);ctx.quadraticCurveTo(cx+130,225,cx+122,360);ctx.quadraticCurveTo(cx+70,315,cx+38,275);ctx.quadraticCurveTo(cx,325,cx-95,340);ctx.closePath();ctx.fill();
+   ctx.strokeStyle="#E9C39D";ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(cx-72,265);ctx.quadraticCurveTo(cx-35,230,cx,238);ctx.moveTo(cx+28,235);ctx.quadraticCurveTo(cx+68,240,cx+90,270);ctx.stroke();
+   // eyes, smile, glasses
+   ctx.strokeStyle=c.ink;ctx.lineWidth=5;ctx.strokeRect(cx-84,355,70,46);ctx.strokeRect(cx+14,355,70,46);line(cx-14,378,cx+14,378,c.ink,5);
+   circle(cx-49,382,6,c.ink);circle(cx+49,382,6,c.ink);line(cx-48,338,cx-18,334,c.ink,5);line(cx+18,334,cx+48,338,c.ink,5);
+   ctx.strokeStyle="#B56D68";ctx.lineWidth=4;ctx.beginPath();ctx.arc(cx,430,23,.15,Math.PI-.15);ctx.stroke();
+   // lightning pin
+   ctx.fillStyle=c.accent;ctx.beginPath();ctx.moveTo(cx-20,605);ctx.lineTo(cx+4,605);ctx.lineTo(cx-12,640);ctx.lineTo(cx+28,625);ctx.lineTo(cx-2,680);ctx.lineTo(cx+4,648);ctx.lineTo(cx-28,660);ctx.closePath();ctx.fill();
+   drawClock(cx+112,650,30,c.accent);
+ }else if(p.tone==="ontime"){
+   // Cute girl / neat bob + cardigan.
+   rr(cx-150,585,300,215,62,c.jacket);rr(cx-176,640,58,145,28,c.jacket);rr(cx+118,640,58,145,28,c.jacket);
+   circle(cx-145,792,27,c.skin);circle(cx+145,792,27,c.skin);
+   ctx.fillStyle=c.skin;ctx.fillRect(cx-36,500,72,95);
+   ctx.fillStyle=c.skin;ctx.beginPath();ctx.moveTo(cx-106,320);ctx.quadraticCurveTo(cx-116,455,cx,525);ctx.quadraticCurveTo(cx+116,455,cx+106,320);ctx.quadraticCurveTo(cx,245,cx-106,320);ctx.fill();
+   ctx.fillStyle=c.hair;ctx.beginPath();ctx.moveTo(cx-120,350);ctx.quadraticCurveTo(cx-118,215,cx,208);ctx.quadraticCurveTo(cx+118,215,cx+120,350);ctx.lineTo(cx+90,470);ctx.lineTo(cx+55,465);ctx.lineTo(cx+62,300);ctx.quadraticCurveTo(cx,270,cx-62,300);ctx.lineTo(cx-55,465);ctx.lineTo(cx-90,470);ctx.closePath();ctx.fill();
+   // headband
+   ctx.strokeStyle=c.accent;ctx.lineWidth=14;ctx.beginPath();ctx.arc(cx,345,116,Math.PI*1.02,Math.PI*1.98);ctx.stroke();
+   // eyes / cheeks / smile
+   circle(cx-47,380,7,c.ink);circle(cx+47,380,7,c.ink);line(cx-70,345,cx-30,342,c.ink,5);line(cx+30,342,cx+70,345,c.ink,5);
+   circle(cx-72,425,10,"rgba(228,133,148,.35)");circle(cx+72,425,10,"rgba(228,133,148,.35)");
+   ctx.strokeStyle="#B56D68";ctx.lineWidth=4;ctx.beginPath();ctx.arc(cx,435,24,.15,Math.PI-.15);ctx.stroke();
+   // cardigan details + watch
+   line(cx-70,610,cx-30,770,"rgba(255,255,255,.65)",4);line(cx+70,610,cx+30,770,"rgba(255,255,255,.65)",4);
+   drawClock(cx+105,620,28,c.accent);
+ }else if(p.tone==="near"){
+   // Soft sleepy boy / hoodie + slightly messy hair.
+   rr(cx-152,575,304,225,72,c.jacket);rr(cx-178,645,64,150,30,c.jacket);rr(cx+114,645,64,150,30,c.jacket);
+   circle(cx-146,794,27,c.skin);circle(cx+146,794,27,c.skin);
+   ctx.fillStyle=c.skin;ctx.fillRect(cx-38,500,76,92);
+   ctx.fillStyle=c.skin;ctx.beginPath();ctx.moveTo(cx-108,320);ctx.quadraticCurveTo(cx-115,455,cx,525);ctx.quadraticCurveTo(cx+115,455,cx+108,320);ctx.quadraticCurveTo(cx,250,cx-108,320);ctx.fill();
+   ctx.fillStyle=c.hair;ctx.beginPath();ctx.moveTo(cx-126,350);ctx.quadraticCurveTo(cx-120,225,cx-35,212);ctx.quadraticCurveTo(cx+20,190,cx+126,270);ctx.quadraticCurveTo(cx+90,290,cx+58,278);ctx.quadraticCurveTo(cx+72,325,cx+35,350);ctx.lineTo(cx+18,290);ctx.quadraticCurveTo(cx-35,350,cx-98,365);ctx.closePath();ctx.fill();
+   // sleepy eyes
+   ctx.strokeStyle=c.ink;ctx.lineWidth=6;ctx.beginPath();ctx.arc(cx-48,382,22,.1,Math.PI-.1);ctx.stroke();ctx.beginPath();ctx.arc(cx+48,382,22,.1,Math.PI-.1);ctx.stroke();
+   line(cx-70,345,cx-28,350,c.ink,5);line(cx+28,350,cx+70,345,c.ink,5);
+   ctx.strokeStyle="#B56D68";ctx.lineWidth=4;ctx.beginPath();ctx.arc(cx,435,22,.1,Math.PI-.1);ctx.stroke();
+   // hoodie strings / little clock
+   line(cx-38,610,cx-18,685,c.ink,4);line(cx+38,610,cx+18,685,c.ink,4);circle(cx,690,10,c.accent);
+   drawClock(cx+108,650,30,c.accent);
+   text("…",cx+126,470,"700 40px sans-serif",c.accent);
+ }else{
+   // Cool late boy / headphones + longer hair.
+   rr(cx-150,580,300,220,65,c.jacket);rr(cx-182,650,64,145,30,c.jacket);rr(cx+118,650,64,145,30,c.jacket);
+   circle(cx-148,792,27,c.skin);circle(cx+148,792,27,c.skin);
+   ctx.fillStyle=c.skin;ctx.fillRect(cx-38,500,76,94);
+   ctx.fillStyle=c.skin;ctx.beginPath();ctx.moveTo(cx-108,320);ctx.quadraticCurveTo(cx-116,460,cx,528);ctx.quadraticCurveTo(cx+116,460,cx+108,320);ctx.quadraticCurveTo(cx,240,cx-108,320);ctx.fill();
+   ctx.fillStyle=c.hair;ctx.beginPath();ctx.moveTo(cx-130,380);ctx.quadraticCurveTo(cx-135,205,cx,190);ctx.quadraticCurveTo(cx+145,205,cx+132,370);ctx.lineTo(cx+92,500);ctx.lineTo(cx+62,440);ctx.lineTo(cx+70,295);ctx.quadraticCurveTo(cx,255,cx-55,300);ctx.lineTo(cx-78,470);ctx.lineTo(cx-112,520);ctx.closePath();ctx.fill();
+   // headphones
+   ctx.strokeStyle="#6E6870";ctx.lineWidth=18;ctx.beginPath();ctx.arc(cx,350,125,Math.PI*1.03,Math.PI*1.97);ctx.stroke();circle(cx-126,370,25,"#6E6870");circle(cx+126,370,25,"#6E6870");
+   // glasses + eyes
+   ctx.strokeStyle=c.ink;ctx.lineWidth=6;ctx.strokeRect(cx-87,365,74,48);ctx.strokeRect(cx+13,365,74,48);line(cx-13,389,cx+13,389,c.ink,5);
+   circle(cx-49,392,6,c.ink);circle(cx+49,392,6,c.ink);line(cx-68,342,cx-28,338,c.ink,5);line(cx+28,338,cx+68,342,c.ink,5);
+   ctx.strokeStyle="#B56D68";ctx.lineWidth=4;ctx.beginPath();ctx.arc(cx,440,23,.15,Math.PI-.15);ctx.stroke();
+   // wind lines
+   line(cx+125,545,cx+185,525,c.accent,5);line(cx+135,565,cx+205,552,c.accent,4);
+   drawClock(cx-112,650,30,c.accent);
+ }
+
+ // Small grounding caption only; no clutter.
+ text("A PORTRAIT OF YOUR TIMING",540,846,"600 16px 'IBM Plex Mono',monospace","#8A7769","center");
+
+ // Result information is the visual hero.
+ rr(left,895,width,710,42,c.paper,"rgba(74,57,48,.10)");
+ text(p.tag,left+46,944,"700 21px 'IBM Plex Mono',monospace",c.accent);
+ text(p.name,left+46,985,"800 76px Prompt,sans-serif",c.ink);
+
+ const descFont="500 27px Prompt,sans-serif";
+ const descLines=wrap(p.desc,840,descFont).slice(0,3);
+ let dy=1095;
+ descLines.forEach(l=>{text(l,left+46,dy,descFont,"#68584D");dy+=43});
+ line(left+46,dy+10,left+width-46,dy+10,"rgba(74,57,48,.14)",2);
+
+ // Three large, high-contrast metrics.
+ const my=1235,mw=274,mh=215,mg=35;
+ const metrics=[
+   ["ESTIMATE",formatMinutes(estimate)+" MIN","เวลาที่คิดไว้",c.soft],
+   ["ACTUAL",formatMinutes(actual)+" MIN","เวลาที่ถึงจริง",c.soft],
+   ["DIFFERENCE",(diff>0?"+":"")+formatMinutes(diff)+" MIN","คลาดเคลื่อน",c.accent]
+ ];
+ metrics.forEach((m,i)=>{
+   const x=left+46+i*(mw+mg);rr(x,my,mw,mh,30,m[3],"rgba(74,57,48,.10)");
+   text(m[0],x+24,my+25,"700 17px 'IBM Plex Mono',monospace","#6D5C50");
+   text(m[1],x+24,my+70,"800 34px 'IBM Plex Mono',monospace",c.ink);
+   text(m[2],x+24,my+137,"500 20px Prompt,sans-serif","#6D5C50");
+   if(i===2)drawClock(x+222,my+165,23,c.ink);
  });
- ctx.fillStyle=muted;ctx.font="500 19px Prompt,sans-serif";ctx.fillText("เวลาของคุณมีค่า เวลาของคนที่รอก็เหมือนกัน.",left+44,1515);
- ctx.fillStyle=brown;ctx.font="700 17px 'IBM Plex Mono',monospace";ctx.fillText("TIME IS RESPECT  ·  TANG MIU",left+44,1570);
- ctx.fillStyle=muted;ctx.font="500 16px 'IBM Plex Mono',monospace";ctx.fillText("9:16 STORY",left+44,1612);
- return{canvas,status:p.tag,diff}
+
+ // One clean closing line and branding.
+ text("TIME IS RESPECT",540,1660,"800 26px 'IBM Plex Mono',monospace",c.ink,"center");
+ text("เวลาของคุณมีค่า เวลาของคนที่รอก็เหมือนกัน",540,1706,"500 23px Prompt,sans-serif","#6D5C50","center");
+ text("TANG MIU",540,1770,"700 17px 'IBM Plex Mono',monospace","#8A7769","center");
+ return{canvas,status:p.tag,diff};
 }
 function canvasToFile(canvas){
  const dataUrl=canvas.toDataURL("image/png");
