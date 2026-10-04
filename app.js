@@ -22,3 +22,167 @@ async function finishRun(){if(!state.startedAt)return;const actualSeconds=elapse
 function startRun(){const estimate=Number($("#estimatedInput").value);if(state.customExcuse){state.excuse=$("#customExcuse").value.trim();if(!state.excuse){alert("พิมพ์เหตุผลของคุณก่อน");$("#customExcuse").focus();return}}if(!state.excuse){alert("เลือกเหตุผลก่อน");return}if(!Number.isFinite(estimate)||estimate<1||estimate>360){alert("ใส่เวลาที่คิดว่าจะถึงระหว่าง 1–360 นาที");return}state.estimated=estimate;state.actualMinutes=null;state.completed=false;state.startedAt=Date.now();$("#estimateReadout").textContent=formatMinutes(estimate)+" MIN";$("#startBtn").disabled=true;$("#finishBtn").classList.add("show");$("#resultBox").classList.remove("show");$("#resetBtn").classList.remove("show");$("#shareBtn").classList.remove("show");$("#timeStage").classList.add("running");$("#stageState").textContent="RUNNING";clearInterval(state.timerInterval);state.timerInterval=setInterval(renderTimer,1000);renderTimer()}
 async function init(){$("#beginBtn").addEventListener("click",startExperience);$("#dashboardBtn").addEventListener("click",()=>$("#dashboard").scrollIntoView({behavior:"smooth"}));$("#resetBtn").addEventListener("click",resetRun);$("#resultResetBtn").addEventListener("click",resetRun);$("#resultDashboardBtn").addEventListener("click",()=>$("#dashboard").scrollIntoView({behavior:"smooth"}));$("#shareBtn").addEventListener("click",shareReceipt);$("#resultShareBtn").addEventListener("click",shareReceipt);$$(".excuse-btn").forEach(btn=>btn.addEventListener("click",()=>{if(state.startedAt)return;$$(".excuse-btn").forEach(b=>b.classList.remove("selected"));btn.classList.add("selected");state.customExcuse=btn.id==="otherExcuseBtn";if(state.customExcuse){$("#customExcuseWrap").classList.remove("hidden");$("#customExcuse").focus();state.excuse=$("#customExcuse").value.trim()||null}else{$("#customExcuseWrap").classList.add("hidden");$("#customExcuse").value="";state.excuse=btn.dataset.excuse}}));$("#customExcuse").addEventListener("input",e=>{if(state.customExcuse)state.excuse=e.target.value.trim()});$("#startBtn").addEventListener("click",startRun);$("#finishBtn").addEventListener("click",finishRun);document.addEventListener("visibilitychange",()=>{if(state.startedAt)renderTimer()});if(state.demo){showStatus("DEMO MODE · ยังไม่ได้เชื่อม Supabase","demo")}else{const{createClient}=window.supabase;state.supabase=createClient(config.url,config.anonKey);showStatus("SYSTEM · LIVE DATABASE CONNECTED")}await fetchStats();if(!state.demo){try{state.supabase.channel("sessions-live").on("postgres_changes",{event:"INSERT",schema:"public",table:"sessions"},fetchStats).subscribe()}catch(e){console.warn("Realtime subscription unavailable",e)}setInterval(fetchStats,15000)}}
 init();
+
+function makeReceiptCanvas(){
+ const p=getPersonality(),actual=Number(state.actualMinutes||0),estimate=Number(state.estimated||0),diff=actual-estimate;
+ const canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1920;
+ const ctx=canvas.getContext("2d");ctx.textBaseline="top";
+ const themes={
+  early:{bg:"#E8F0E7",paper:"#FFF9EE",accent:"#719D7C",soft:"#D6E7D8",hair:"#C9B19A",coat:"#526A63",shirt:"#F4EEE5",skin:"#F0C6B0"},
+  ontime:{bg:"#E7EEF0",paper:"#FFF9EE",accent:"#6799A7",soft:"#D4E5E9",hair:"#5A4A46",coat:"#496274",shirt:"#F4EEE5",skin:"#E9BFAE"},
+  near:{bg:"#F2E8DA",paper:"#FFF9EE",accent:"#BD8750",soft:"#EAD8B9",hair:"#8B5C46",coat:"#806A57",shirt:"#F7EEE2",skin:"#EBC0A9"},
+  late:{bg:"#F1E1E6",paper:"#FFF9EE",accent:"#C97889",soft:"#E8CCD4",hair:"#332E38",coat:"#654B61",shirt:"#F3E7E5",skin:"#E8B8AE"}
+ };
+ const t=themes[p.tone]||themes.ontime;
+ const text=(v,x,y,font,fill="#34383A",align="left")=>{ctx.font=font;ctx.fillStyle=fill;ctx.textAlign=align;ctx.fillText(String(v??""),x,y);ctx.textAlign="left"};
+ const rr=(x,y,w,h,r,fill,stroke)=>{ctx.fillStyle=fill;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke()}};
+ const line=(x1,y1,x2,y2,c,w=3)=>{ctx.strokeStyle=c;ctx.lineWidth=w;ctx.lineCap="round";ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()};
+ const tape=(x,y,w,h,r)=>{ctx.save();ctx.translate(x,y);ctx.rotate(r);ctx.fillStyle="rgba(220,190,145,.58)";ctx.fillRect(-w/2,-h/2,w,h);ctx.restore()};
+ const wrap=(v,max,font)=>{ctx.font=font;const words=String(v||"").split(/\s+/),out=[];let z="";for(const word of words){const n=z?z+" "+word:word;if(ctx.measureText(n).width>max&&z){out.push(z);z=word}else z=n}if(z)out.push(z);return out};
+
+ // Detailed illustrated character: deliberately hand-drawn/semi-realistic, not a minimal icon.
+ const drawCharacter=(tone)=>{
+  const cfg=themes[tone]||themes.ontime, cx=540, headY=455;
+  ctx.save();
+  // soft portrait-card glow
+  const halo=ctx.createRadialGradient(cx,390,40,cx,440,510);halo.addColorStop(0,"rgba(255,255,255,.96)");halo.addColorStop(1,"rgba(255,255,255,0)");ctx.fillStyle=halo;ctx.fillRect(0,150,1080,780);
+  // shoulders / clothing
+  ctx.fillStyle=cfg.coat;ctx.beginPath();ctx.moveTo(170,900);ctx.quadraticCurveTo(220,730,400,700);ctx.quadraticCurveTo(540,760,680,700);ctx.quadraticCurveTo(860,730,930,900);ctx.lineTo(930,1010);ctx.lineTo(150,1010);ctx.closePath();ctx.fill();
+  ctx.fillStyle="rgba(255,255,255,.10)";ctx.beginPath();ctx.moveTo(230,820);ctx.quadraticCurveTo(330,755,430,760);ctx.lineTo(365,1010);ctx.lineTo(180,1010);ctx.closePath();ctx.fill();
+  // shirt and collar
+  ctx.fillStyle=cfg.shirt;ctx.beginPath();ctx.moveTo(420,700);ctx.lineTo(540,790);ctx.lineTo(660,700);ctx.lineTo(705,1010);ctx.lineTo(375,1010);ctx.closePath();ctx.fill();
+  ctx.fillStyle="rgba(70,55,50,.10)";ctx.beginPath();ctx.moveTo(455,725);ctx.lineTo(540,805);ctx.lineTo(625,725);ctx.lineTo(605,830);ctx.lineTo(540,860);ctx.lineTo(475,830);ctx.closePath();ctx.fill();
+  // neck
+  ctx.fillStyle=cfg.skin;ctx.beginPath();ctx.moveTo(475,620);ctx.lineTo(475,760);ctx.quadraticCurveTo(540,800,605,760);ctx.lineTo(605,620);ctx.closePath();ctx.fill();
+  // face silhouette
+  ctx.fillStyle=cfg.skin;ctx.beginPath();
+  ctx.moveTo(390,355);ctx.quadraticCurveTo(385,520,420,610);ctx.quadraticCurveTo(455,690,540,710);ctx.quadraticCurveTo(625,690,660,610);ctx.quadraticCurveTo(695,520,690,355);
+  ctx.quadraticCurveTo(640,255,540,250);ctx.quadraticCurveTo(440,255,390,355);ctx.closePath();ctx.fill();
+  // face shading
+  const shade=ctx.createLinearGradient(400,330,680,650);shade.addColorStop(0,"rgba(255,255,255,.34)");shade.addColorStop(.58,"rgba(255,255,255,0)");shade.addColorStop(1,"rgba(155,92,79,.13)");ctx.fillStyle=shade;ctx.fill();
+  // ears
+  ctx.fillStyle=cfg.skin;ctx.beginPath();ctx.moveTo(402,410);ctx.quadraticCurveTo(365,395,382,465);ctx.quadraticCurveTo(397,500,420,475);ctx.fill();ctx.beginPath();ctx.moveTo(678,410);ctx.quadraticCurveTo(715,395,698,465);ctx.quadraticCurveTo(683,500,660,475);ctx.fill();
+  // hair mass
+  ctx.fillStyle=cfg.hair;ctx.beginPath();
+  ctx.moveTo(372,410);ctx.quadraticCurveTo(335,285,420,205);ctx.quadraticCurveTo(505,130,620,185);ctx.quadraticCurveTo(715,195,730,320);ctx.quadraticCurveTo(695,285,665,300);ctx.quadraticCurveTo(650,250,620,275);ctx.quadraticCurveTo(610,210,580,270);ctx.quadraticCurveTo(560,200,530,270);ctx.quadraticCurveTo(495,185,460,290);ctx.quadraticCurveTo(420,250,392,340);ctx.closePath();ctx.fill();
+  // individual hair locks / highlights
+  ctx.strokeStyle="rgba(255,240,225,.55)";ctx.lineWidth=12;ctx.lineCap="round";
+  [[420,255,405,360],[465,220,445,345],[515,205,500,330],[565,205,555,325],[615,220,600,330],[665,245,650,350]].forEach(q=>{ctx.beginPath();ctx.moveTo(q[0],q[1]);ctx.quadraticCurveTo(q[0]-8,q[1]+65,q[2],q[3]);ctx.stroke()});
+  ctx.strokeStyle="rgba(65,48,45,.18)";ctx.lineWidth=6;
+  [[430,300,410,390],[490,275,475,365],[550,275,540,355],[610,285,600,360]].forEach(q=>{ctx.beginPath();ctx.moveTo(q[0],q[1]);ctx.quadraticCurveTo(q[0]-5,q[1]+55,q[2],q[3]);ctx.stroke()});
+  // brows
+  ctx.strokeStyle="#513E3A";ctx.lineWidth=12;ctx.beginPath();ctx.moveTo(425,405);ctx.quadraticCurveTo(470,380,510,405);ctx.stroke();ctx.beginPath();ctx.moveTo(570,405);ctx.quadraticCurveTo(610,380,655,405);ctx.stroke();
+  // eyes with irises, highlights
+  const eye=(x,y,flip)=>{ctx.fillStyle="#FFF9F3";ctx.beginPath();ctx.ellipse(x,y,43,24,flip?.06:-.06,0,Math.PI*2);ctx.fill();ctx.fillStyle="#5C4A43";ctx.beginPath();ctx.ellipse(x+(flip?-4:4),y+1,16,20,0,0,Math.PI*2);ctx.fill();ctx.fillStyle="#191B1D";ctx.beginPath();ctx.arc(x+(flip?-4:4),y+2,8,0,Math.PI*2);ctx.fill();ctx.fillStyle="#FFF";ctx.beginPath();ctx.arc(x+(flip?-9:-1),y-6,4,0,Math.PI*2);ctx.fill()};
+  eye(466,438,false);eye(614,438,true);
+  // glasses, signature reference vibe
+  ctx.strokeStyle="#3D4247";ctx.lineWidth=7;ctx.beginPath();ctx.roundRect(412,405,112,68,25);ctx.stroke();ctx.beginPath();ctx.roundRect(555,405,112,68,25);ctx.stroke();line(524,431,555,431,"#3D4247",6);
+  // nose and lips
+  ctx.strokeStyle="rgba(125,76,69,.45)";ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(545,447);ctx.quadraticCurveTo(530,505,548,520);ctx.quadraticCurveTo(565,524,574,514);ctx.stroke();
+  ctx.fillStyle="#C97979";ctx.beginPath();ctx.moveTo(507,555);ctx.quadraticCurveTo(540,540,575,555);ctx.quadraticCurveTo(540,585,507,555);ctx.fill();
+  ctx.strokeStyle="rgba(95,56,55,.55)";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(514,557);ctx.quadraticCurveTo(540,564,568,557);ctx.stroke();
+  // blush
+  ctx.fillStyle="rgba(226,127,135,.18)";ctx.beginPath();ctx.ellipse(432,520,55,22,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(625,520,55,22,0,0,Math.PI*2);ctx.fill();
+  // headphones on all but vary color
+  ctx.strokeStyle=cfg.accent;ctx.lineWidth=22;ctx.beginPath();ctx.arc(540,365,183,Math.PI*1.05,Math.PI*1.95);ctx.stroke();
+  ctx.fillStyle=cfg.accent;ctx.beginPath();ctx.ellipse(385,385,38,58,-.12,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(695,385,38,58,.12,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="rgba(255,255,255,.35)";ctx.beginPath();ctx.ellipse(385,385,21,34,-.12,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(695,385,21,34,.12,0,Math.PI*2);ctx.fill();
+  // variant-specific styling
+  if(tone==="early"){
+   // cheerful cat companion
+   ctx.fillStyle="#D8D0C5";ctx.beginPath();ctx.ellipse(760,665,82,62,-.08,0,Math.PI*2);ctx.fill();
+   ctx.beginPath();ctx.moveTo(700,640);ctx.lineTo(710,570);ctx.lineTo(755,620);ctx.fill();ctx.beginPath();ctx.moveTo(810,620);ctx.lineTo(850,570);ctx.lineTo(850,650);ctx.fill();
+   ctx.fillStyle="#30383B";ctx.beginPath();ctx.arc(740,650,10,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(800,650,10,0,Math.PI*2);ctx.fill();
+   text("✦",745,545,"36px serif",cfg.accent);text("✦",825,520,"26px serif",cfg.accent);
+  }else if(tone==="ontime"){
+   // neat beret + calm pose
+   ctx.fillStyle="#344A59";ctx.beginPath();ctx.ellipse(545,188,190,55,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(545,175,130,65,0,0,Math.PI*2);ctx.fill();
+   text("✓",870,570,"74px sans-serif",cfg.accent);
+  }else if(tone==="near"){
+   // warm scarf / slightly playful expression
+   ctx.fillStyle="#C98A5A";ctx.beginPath();ctx.moveTo(420,720);ctx.quadraticCurveTo(540,770,660,720);ctx.lineTo(650,815);ctx.quadraticCurveTo(540,850,430,815);ctx.closePath();ctx.fill();
+   text("…",820,535,"70px sans-serif",cfg.accent);
+  }else{
+   // dark stylish hood + determined sparkle
+   ctx.fillStyle="rgba(39,32,45,.72)";ctx.beginPath();ctx.arc(540,465,350,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle=cfg.coat;ctx.beginPath();ctx.moveTo(190,930);ctx.quadraticCurveTo(220,680,350,640);ctx.lineTo(405,770);ctx.lineTo(315,1010);ctx.closePath();ctx.fill();
+   // redraw face window on top so the hood frames the face
+   ctx.save();ctx.globalCompositeOperation="source-over";ctx.fillStyle="rgba(255,255,255,.001)";ctx.fillRect(0,0,1,1);ctx.restore();
+   text("!",840,300,"92px sans-serif",cfg.accent);
+  }
+  // foreground hand/pose for editorial feel
+  ctx.fillStyle=cfg.skin;ctx.beginPath();ctx.moveTo(680,650);ctx.quadraticCurveTo(745,610,790,670);ctx.quadraticCurveTo(815,705,790,735);ctx.quadraticCurveTo(755,760,715,735);ctx.lineTo(655,700);ctx.closePath();ctx.fill();
+  ctx.strokeStyle="rgba(130,77,70,.22)";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(724,672);ctx.quadraticCurveTo(760,690,786,706);ctx.stroke();ctx.beginPath();ctx.moveTo(715,690);ctx.quadraticCurveTo(752,710,775,724);ctx.stroke();
+  ctx.restore();
+ };
+
+ ctx.fillStyle=t.bg;ctx.fillRect(0,0,1080,1920);
+ const bg=ctx.createLinearGradient(0,0,0,1920);bg.addColorStop(0,"rgba(255,255,255,.52)");bg.addColorStop(.58,"rgba(255,248,235,.08)");bg.addColorStop(1,"rgba(255,255,255,.5)");ctx.fillStyle=bg;ctx.fillRect(0,0,1080,1920);
+ text("TIME IS RESPECT",58,50,"900 italic 42px sans-serif","#304047");
+ text("THE REAL-TIME EXCUSE DASHBOARD",60,105,"600 17px 'IBM Plex Mono',monospace","#716158");
+ rr(850,48,170,116,18,"#F4E7D3","rgba(70,55,46,.08)");
+ text("GOOD",875,69,"900 24px sans-serif","#30393B");text("THINGS",866,99,"900 24px sans-serif","#30393B");text("TAKE TIME",855,129,"900 21px sans-serif","#30393B");
+ const px=42,py=190,pw=996,ph=850;
+ rr(px-10,py-10,pw+20,ph+20,34,"#FFFDF7","rgba(70,55,46,.10)");
+ ctx.save();ctx.beginPath();ctx.roundRect(px,py,pw,ph,26);ctx.clip();
+ drawCharacter(p.tone);
+ const portraitShade=ctx.createLinearGradient(0,180,0,850);portraitShade.addColorStop(0,"rgba(255,255,255,.05)");portraitShade.addColorStop(.68,"rgba(255,245,230,0)");portraitShade.addColorStop(1,"rgba(80,55,45,.16)");ctx.fillStyle=portraitShade;ctx.fillRect(0,0,pw,ph);ctx.restore();
+ tape(125,205,130,36,-.08);tape(920,214,120,34,.1);
+  rr(365,810,350,54,27,"rgba(47,57,58,.80)");text(p.tag,540,825,"800 18px 'IBM Plex Mono',monospace","#FFF9EE","center");
+ rr(36,855,1008,850,40,t.paper,"rgba(73,58,49,.10)");
+ tape(110,870,125,34,-.12);tape(970,873,115,32,.1);
+ text("YOUR TIME PERSONALITY",82,910,"700 20px 'IBM Plex Mono',monospace","#76685F");
+ text(p.name,82,954,"900 76px Prompt,sans-serif","#30383B");
+ line(82,1048,998,1048,"rgba(75,59,49,.14)",2);
+ const descLines=wrap(p.desc,850,"500 27px Prompt,sans-serif").slice(0,3);
+ descLines.forEach((z,i)=>text(z,82,1080+i*42,"500 27px Prompt,sans-serif","#514844"));
+ const cards=[["ESTIMATE",formatMinutes(estimate)+" MIN","เวลาที่คิดไว้","#F3DFC0"],["ACTUAL",formatMinutes(actual)+" MIN","เวลาที่ถึงจริง","#F0D5DC"],["DIFFERENCE",(diff>0?"+":"")+formatMinutes(diff)+" MIN","คลาดเคลื่อน",t.soft]];
+ cards.forEach((m,i)=>{const x=82+i*306;rr(x,1230,282,214,28,m[3],"rgba(70,55,46,.08)");text(m[0],x+22,1253,"700 17px 'IBM Plex Mono',monospace","#6B5D55");text(m[1],x+22,1303,"900 31px 'IBM Plex Mono',monospace","#30383B");text(m[2],x+22,1368,"500 19px Prompt,sans-serif","#6B5D55")});
+ text("TIME RECEIPT",82,1500,"900 34px sans-serif","#30383B");line(82,1546,345,1546,t.accent,6);
+ text("เวลาของทุกคนมีค่าเท่ากัน",82,1580,"500 25px Prompt,sans-serif","#5D514B");
+ rr(720,1500,250,104,18,"#F3E7D3","rgba(70,55,46,.08)");
+ text("SEE YOU",845,1525,"800 18px 'IBM Plex Mono',monospace","#4D4541","center");text("ON TIME. ♡",845,1555,"900 23px sans-serif","#30383B","center");
+ text("TANG MIU",540,1652,"700 16px 'IBM Plex Mono',monospace","#8A776B","center");
+ ctx.strokeStyle=t.accent;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(930,1718);ctx.lineTo(948,1736);ctx.lineTo(976,1699);ctx.stroke();
+ text("TIME IS RESPECT",540,1768,"900 27px sans-serif","#30383B","center");
+ return{canvas,status:p.tag,diff};
+}function canvasToFile(canvas){
+ const dataUrl=canvas.toDataURL("image/png");
+ const base64=dataUrl.split(",")[1];
+ const binary=atob(base64),bytes=new Uint8Array(binary.length);
+ for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+ return new File([bytes],"time-is-respect-personality.png",{type:"image/png"});
+}
+async function shareReceipt(){
+ if(!state.completed||state.actualMinutes==null)return;
+ const file=canvasToFile(makeReceiptCanvas().canvas);
+ const shareData={files:[file],title:"TIME IS RESPECT",text:"My Time Personality"};
+ try{
+   if(typeof navigator.share==="function"){
+     let supported=false;
+     try{supported=typeof navigator.canShare==="function"?navigator.canShare({files:[file]}):false}catch(e){supported=false}
+     if(supported){
+       try{await navigator.share(shareData);return}
+       catch(e){if(e&&e.name==="AbortError")return;console.warn("Story share unavailable; using download fallback.",e)}
+     }
+   }
+ }catch(e){console.warn("Story share failed; using download fallback.",e)}
+ try{
+   const url=URL.createObjectURL(file);
+   const link=document.createElement("a");
+   link.href=url;
+   link.download="time-is-respect-personality.png";
+   link.style.display="none";
+   document.body.appendChild(link);
+   link.click();
+   link.remove();
+   setTimeout(()=>URL.revokeObjectURL(url),60000);
+ }catch(e){
+   console.error("Story image download failed.",e);
+   alert("เซฟภาพ Story ไม่สำเร็จ ลองรีเฟรชหน้าเว็บแล้วกดอีกครั้ง");
+ }
+}
+function renderComparison(){const box=$("#youVsEveryone");if(!box||!state.completed)return;const stats=state.dashboardStats||{};const everyone=Number(stats.avg||0);const you=Number(state.actualMinutes||0);if(!Number.isFinite(everyone)||!Number.isFinite(you)||everyone<=0||you<=0)return;$("#yourActual").textContent=formatMinutes(you);$("#everyoneActual").textContent=formatMinutes(everyone);const delta=you-everyone;$("#compareStatus").textContent=delta>0?"ABOVE AVERAGE":delta<0?"BELOW AVERAGE":"ON AVERAGE";$("#compareMessage").textContent=delta>0?"ครั้งนี้คุณใช้เวลามากกว่าค่าเฉลี่ยรวม "+formatMinutes(delta)+" นาที":delta<0?"ครั้งนี้คุณใช้เวลาน้อยกว่าค่าเฉลี่ยรวม "+formatMinutes(Math.abs(delta))+" นาที":"ครั้งนี้คุณใช้เวลาเท่ากับค่าเฉลี่ยรวม";box.classList.remove("hidden")}
+
+function getPersonality(){const actual=Number(state.actualMinutes||0),estimate=Math.max(Number(state.estimated||0),.1),diff=actual-estimate;const onTimeTolerance=Math.max(1,estimate*.1),earlyThreshold=-Math.max(2,estimate*.2),nearLateThreshold=Math.max(5,estimate*.5);if(diff<=earlyThreshold)return{emoji:"⚡",name:"สายวาร์ป",tag:"EARLY BIRD MODE",desc:"คุณไม่ได้แค่ไปถึงตรงเวลา — คุณเผื่อเวลาให้ตัวเองอย่างชัดเจน เวลาของคุณเดินเร็วกว่าที่คาดไว้พอสมควร",tone:"early"};if(Math.abs(diff)<=onTimeTolerance)return{emoji:"🎯",name:"สายตรงเป๊ะ",tag:"RIGHT ON TIME",desc:"กะเวลาได้แม่นมาก ความคลาดเคลื่อนอยู่ในช่วงที่ถือว่าใกล้เคียงเวลาที่คุณคาดไว้",tone:"ontime"};if(diff<=nearLateThreshold)return{emoji:"🫠",name:"สายเฉียด",tag:"JUST A LITTLE LATE",desc:"คุณมาถึงช้ากว่าที่คิด แต่ยังไม่หลุดไปไกล ครั้งหน้าขยับเวลาเผื่ออีกนิดก็มีโอกาสเป๊ะขึ้นแล้ว",tone:"near"};return{emoji:"🌪️",name:"สายปล่อยเวลาไหล",tag:"TIME GOT AWAY",desc:"เวลาจริงห่างจากเวลาที่คุณคาดไว้มากพอที่จะกลายเป็นการรอ สำหรับคุณคำว่า “กำลังไป” อาจยาวกว่าที่คิด",tone:"late"}}
+function showPersonalityResult(){const p=getPersonality(),actual=Number(state.actualMinutes),estimate=Number(state.estimated),diff=actual-estimate;$("#character").textContent=p.emoji;$("#typeName").textContent=p.name;$("#typeDescription").textContent=p.desc;$("#personalityTag").textContent=p.tag;$("#personalityEstimate").textContent=formatMinutes(estimate);$("#personalityActual").textContent=formatMinutes(actual);$("#personalityGap").textContent=(diff>0?"+":"")+formatMinutes(diff);$("#personalityCard").dataset.type=p.tone;$("#experience").classList.add("hidden");$("#resultPage").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});$("#resultShareBtn").classList.add("show");$("#resultResetBtn").classList.add("show")}
