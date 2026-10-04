@@ -47,6 +47,14 @@ function makeReceiptCanvas(){
  ctx.fillStyle="#806D5F";ctx.font="500 19px 'IBM Plex Mono',monospace";ctx.fillText("BASE ON · TANG MIU",left,1650);ctx.fillText("TIME IS RESPECT",left,1690);
  return{canvas,status:p.tag,diff}
 }
+function canvasToFile(canvas){
+ const dataUrl=canvas.toDataURL("image/png");
+ const parts=dataUrl.split(",");
+ const binary=atob(parts[1]);
+ const bytes=new Uint8Array(binary.length);
+ for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+ return new File([bytes],"time-is-respect-personality.png",{type:"image/png"});
+}
 async function shareReceipt(){if(!state.completed||state.actualMinutes==null)return;const{canvas}=makeReceiptCanvas();const file=canvasToFile(canvas);const shareData={files:[file],title:"TIME IS RESPECT",text:"My Time Personality"};if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share(shareData);return}catch(e){if(e.name==="AbortError")return;console.warn("File share failed",e)}}const url=URL.createObjectURL(file);const win=window.open(url,"_blank");if(!win){const a=document.createElement("a");a.href=url;a.download="time-is-respect-personality.png";document.body.appendChild(a);a.click();a.remove()}setTimeout(()=>URL.revokeObjectURL(url),60000)}
 function renderComparison(){const box=$("#youVsEveryone");if(!box||!state.completed)return;const stats=state.dashboardStats||{};const everyone=Number(stats.avg||0);const you=Number(state.actualMinutes||0);if(!Number.isFinite(everyone)||!Number.isFinite(you)||everyone<=0||you<=0)return;$("#yourActual").textContent=formatMinutes(you);$("#everyoneActual").textContent=formatMinutes(everyone);const delta=you-everyone;$("#compareStatus").textContent=delta>0?"ABOVE AVERAGE":delta<0?"BELOW AVERAGE":"ON AVERAGE";$("#compareMessage").textContent=delta>0?"ครั้งนี้คุณใช้เวลามากกว่าค่าเฉลี่ยรวม "+formatMinutes(delta)+" นาที":delta<0?"ครั้งนี้คุณใช้เวลาน้อยกว่าค่าเฉลี่ยรวม "+formatMinutes(Math.abs(delta))+" นาที":"ครั้งนี้คุณใช้เวลาเท่ากับค่าเฉลี่ยรวม";box.classList.remove("hidden")}
 
