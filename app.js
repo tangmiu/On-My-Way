@@ -49,13 +49,40 @@ function makeReceiptCanvas(){
 }
 function canvasToFile(canvas){
  const dataUrl=canvas.toDataURL("image/png");
- const parts=dataUrl.split(",");
- const binary=atob(parts[1]);
- const bytes=new Uint8Array(binary.length);
+ const base64=dataUrl.split(",")[1];
+ const binary=atob(base64),bytes=new Uint8Array(binary.length);
  for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
  return new File([bytes],"time-is-respect-personality.png",{type:"image/png"});
 }
-async function shareReceipt(){if(!state.completed||state.actualMinutes==null)return;const{canvas}=makeReceiptCanvas();const file=canvasToFile(canvas);const shareData={files:[file],title:"TIME IS RESPECT",text:"My Time Personality"};if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share(shareData);return}catch(e){if(e.name==="AbortError")return;console.warn("File share failed",e)}}const url=URL.createObjectURL(file);const win=window.open(url,"_blank");if(!win){const a=document.createElement("a");a.href=url;a.download="time-is-respect-personality.png";document.body.appendChild(a);a.click();a.remove()}setTimeout(()=>URL.revokeObjectURL(url),60000)}
+async function shareReceipt(){
+ if(!state.completed||state.actualMinutes==null)return;
+ const file=canvasToFile(makeReceiptCanvas().canvas);
+ const shareData={files:[file],title:"TIME IS RESPECT",text:"My Time Personality"};
+ try{
+   if(typeof navigator.share==="function"){
+     let supported=false;
+     try{supported=typeof navigator.canShare==="function"?navigator.canShare({files:[file]}):false}catch(e){supported=false}
+     if(supported){
+       try{await navigator.share(shareData);return}
+       catch(e){if(e&&e.name==="AbortError")return;console.warn("Story share unavailable; using download fallback.",e)}
+     }
+   }
+ }catch(e){console.warn("Story share failed; using download fallback.",e)}
+ try{
+   const url=URL.createObjectURL(file);
+   const link=document.createElement("a");
+   link.href=url;
+   link.download="time-is-respect-personality.png";
+   link.style.display="none";
+   document.body.appendChild(link);
+   link.click();
+   link.remove();
+   setTimeout(()=>URL.revokeObjectURL(url),60000);
+ }catch(e){
+   console.error("Story image download failed.",e);
+   alert("เซฟภาพ Story ไม่สำเร็จ ลองรีเฟรชหน้าเว็บแล้วกดอีกครั้ง");
+ }
+}
 function renderComparison(){const box=$("#youVsEveryone");if(!box||!state.completed)return;const stats=state.dashboardStats||{};const everyone=Number(stats.avg||0);const you=Number(state.actualMinutes||0);if(!Number.isFinite(everyone)||!Number.isFinite(you)||everyone<=0||you<=0)return;$("#yourActual").textContent=formatMinutes(you);$("#everyoneActual").textContent=formatMinutes(everyone);const delta=you-everyone;$("#compareStatus").textContent=delta>0?"ABOVE AVERAGE":delta<0?"BELOW AVERAGE":"ON AVERAGE";$("#compareMessage").textContent=delta>0?"ครั้งนี้คุณใช้เวลามากกว่าค่าเฉลี่ยรวม "+formatMinutes(delta)+" นาที":delta<0?"ครั้งนี้คุณใช้เวลาน้อยกว่าค่าเฉลี่ยรวม "+formatMinutes(Math.abs(delta))+" นาที":"ครั้งนี้คุณใช้เวลาเท่ากับค่าเฉลี่ยรวม";box.classList.remove("hidden")}
 
 function getPersonality(){const actual=Number(state.actualMinutes||0),estimate=Math.max(Number(state.estimated||0),.1),diff=actual-estimate;const onTimeTolerance=Math.max(1,estimate*.1),earlyThreshold=-Math.max(2,estimate*.2),nearLateThreshold=Math.max(5,estimate*.5);if(diff<=earlyThreshold)return{emoji:"⚡",name:"สายวาร์ป",tag:"EARLY BIRD MODE",desc:"คุณไม่ได้แค่ไปถึงตรงเวลา — คุณเผื่อเวลาให้ตัวเองอย่างชัดเจน เวลาของคุณเดินเร็วกว่าที่คาดไว้พอสมควร",tone:"early"};if(Math.abs(diff)<=onTimeTolerance)return{emoji:"🎯",name:"สายตรงเป๊ะ",tag:"RIGHT ON TIME",desc:"กะเวลาได้แม่นมาก ความคลาดเคลื่อนอยู่ในช่วงที่ถือว่าใกล้เคียงเวลาที่คุณคาดไว้",tone:"ontime"};if(diff<=nearLateThreshold)return{emoji:"🫠",name:"สายเฉียด",tag:"JUST A LITTLE LATE",desc:"คุณมาถึงช้ากว่าที่คิด แต่ยังไม่หลุดไปไกล ครั้งหน้าขยับเวลาเผื่ออีกนิดก็มีโอกาสเป๊ะขึ้นแล้ว",tone:"near"};return{emoji:"🌪️",name:"สายปล่อยเวลาไหล",tag:"TIME GOT AWAY",desc:"เวลาจริงห่างจากเวลาที่คุณคาดไว้มากพอที่จะกลายเป็นการรอ สำหรับคุณคำว่า “กำลังไป” อาจยาวกว่าที่คิด",tone:"late"}}
