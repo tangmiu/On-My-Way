@@ -24,10 +24,10 @@ async function init(){$("#beginBtn").addEventListener("click",startExperience);$
 init();
 
 const shareCharacterImages={early:new Image(),ontime:new Image(),near:new Image(),late:new Image()};
-shareCharacterImages.early.src="assets/share-early.jpg";
-shareCharacterImages.ontime.src="assets/share-ontime.jpg";
-shareCharacterImages.near.src="assets/share-near.jpg";
-shareCharacterImages.late.src="assets/share-late.jpg";const shareCharacterImage=new Image();shareCharacterImage.src=shareCharacterSprite;
+shareCharacterImages.early.src="https://pikaso.cdnpk.net/private/production/5632892746/render.png?token=exp=1791331200~hmac=76f459454f002c9fbfb4e8bc308d3eee08361e3d987be6eeb959df223b78150a";
+shareCharacterImages.ontime.src="https://pikaso.cdnpk.net/private/production/5632893843/render.png?token=exp=1791331200~hmac=6c4f8743e28decd52c85bb3f50493a0cbfe99d25a5f8a35f400068c078fd9825";
+shareCharacterImages.near.src="https://pikaso.cdnpk.net/private/production/5632892898/render.png?token=exp=1791331200~hmac=0948d6b256c37cd3cc057dfbe9ffecc89f7408b9b206a08355e4122cb8f3b982";
+shareCharacterImages.late.src="https://pikaso.cdnpk.net/private/production/5632893673/render.png?token=exp=1791331200~hmac=fe82a26470e895c85a620d4691610c08d2a7515adf2c702b9199fa9d3c5b17cd";const shareCharacterImage=new Image();shareCharacterImage.src=shareCharacterSprite;
 function makeReceiptCanvas(){
  const p=getPersonality(),actual=Number(state.actualMinutes||0),estimate=Number(state.estimated||0),diff=actual-estimate;
  const canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1920;
