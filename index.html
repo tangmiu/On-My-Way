@@ -64,7 +64,27 @@
 <button class="reset-btn" id="resetBtn">START AGAIN</button>
 </section>
 
-<section class="dashboard" id="dashboard">
+<section class="result-page hidden" id="resultPage">
+<div class="result-page-top"><span>03 / YOUR TYPE</span><span>TIME RECEIPT</span></div>
+<div class="personality-card" id="personalityCard">
+<div class="personality-accent"></div>
+<div class="personality-kicker">YOUR TIME PERSONALITY</div>
+<div class="character-wrap"><div class="character" id="character">⏱️</div></div>
+<div class="type-label" id="typeLabel">YOU ARE...</div>
+<h2 id="typeName">กำลังวิเคราะห์</h2>
+<p class="type-description" id="typeDescription">...</p>
+<div class="personality-stats">
+<div><span>ESTIMATE</span><strong id="personalityEstimate">—</strong><small>MIN</small></div>
+<div><span>ACTUAL</span><strong id="personalityActual">—</strong><small>MIN</small></div>
+<div><span>GAP</span><strong id="personalityGap">—</strong><small>MIN</small></div>
+</div>
+<div class="personality-tag" id="personalityTag">TIME IS RESPECT</div>
+<div class="personality-credit">BASE ON · แนวคิดและไอเดียโดย <strong>Tang Miu</strong></div>
+</div>
+<button class="share-btn result-share" id="resultShareBtn">SHARE / SAVE TO STORY <span>↗</span></button>
+<button class="result-dashboard-btn" id="resultDashboardBtn">SEE EVERYONE'S DATA <span>↘</span></button>
+<button class="reset-btn result-reset" id="resultResetBtn">TRY AGAIN</button>
+</section>\n<section class="dashboard" id="dashboard">
 <div class="dashboard-head"><div><div class="eyebrow">LIVE DATA</div><h2>ความจริงของทุกคน</h2><p class="small">ข้อมูลรวมจากผู้เข้าร่วมทั้งหมด · อัปเดตอัตโนมัติ</p></div><div class="live-dot"><i></i> LIVE</div></div>
 <div class="data-story" id="dataStory"><div class="story-top"><span>THE REALITY CHECK</span><span id="storyLive">LIVE</span></div><div class="story-main"><div class="story-kicker">SO FAR, THE DATA SAYS</div><h3 id="storyHeadline">กำลังรอข้อมูลชุดแรก...</h3><p id="storySub">ทุกการกด “I’M HERE” จะทำให้ภาพนี้ชัดขึ้น</p></div><div class="story-metrics"><div><span>ESTIMATED</span><strong id="storyEstimated">—</strong><small>MIN AVG</small></div><div class="story-arrow">→</div><div><span>ACTUAL</span><strong id="storyActual">—</strong><small>MIN AVG</small></div><div class="story-gap"><span>GAP</span><strong id="storyGap">—</strong><small>MIN</small></div></div></div><div class="dashboard-grid">
 <div class="stat stat-large"><div class="stat-label">PEOPLE PARTICIPATED</div><div class="stat-value" id="peopleCount">—</div><div class="stat-label">คน</div></div>
