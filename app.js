@@ -20,55 +20,7 @@ function startExperience(){$("#intro").classList.add("hidden");$("#experience").
 function resetRun(){state.excuse=null;state.customExcuse=false;state.estimated=null;state.startedAt=null;state.actualMinutes=null;state.completed=false;clearInterval(state.timerInterval);state.timerInterval=null;$$(".excuse-btn").forEach(b=>b.classList.remove("selected"));$("#estimatedInput").value="";$("#customExcuse").value="";$("#customExcuseWrap").classList.add("hidden");$("#estimateReadout").textContent="—";$("#timer").textContent="00:00";$("#timerMessage").textContent="“กำลังไป” เริ่มต้นที่นี่";$("#stageState").textContent="READY";$("#timeStage").classList.remove("running","over");$("#finishBtn").classList.remove("show");$("#startBtn").disabled=false;$("#resultBox").classList.remove("show");$("#shareBtn").classList.remove("show");$("#resetBtn").classList.remove("show");$("#youVsEveryone").classList.add("hidden");$("#timerProgress").style.width="0%";$("#resultPage").classList.add("hidden");$("#experience").classList.remove("hidden");window.scrollTo({top:$("#experience").offsetTop-20,behavior:"smooth"})}
 async function finishRun(){if(!state.startedAt)return;const actualSeconds=elapsedSeconds(),actualMinutes=actualSeconds/60;$("#finishBtn").disabled=true;const result=await submitRow(actualMinutes);if(!result.ok){$("#finishBtn").disabled=false;$("#resultBox").classList.add("show");$("#resultBox").innerHTML='<div class="receipt-label">DATABASE ERROR</div><div class="receipt-copy">บันทึกไม่สำเร็จ ลองอีกครั้งในอีกสักครู่</div>';return}state.actualMinutes=actualMinutes;state.completed=true;clearInterval(state.timerInterval);state.timerInterval=null;$("#finishBtn").classList.remove("show");$("#resultBox").classList.remove("show");$("#startBtn").disabled=false;await fetchStats();renderComparison();showPersonalityResult();}
 function startRun(){const estimate=Number($("#estimatedInput").value);if(state.customExcuse){state.excuse=$("#customExcuse").value.trim();if(!state.excuse){alert("พิมพ์เหตุผลของคุณก่อน");$("#customExcuse").focus();return}}if(!state.excuse){alert("เลือกเหตุผลก่อน");return}if(!Number.isFinite(estimate)||estimate<1||estimate>360){alert("ใส่เวลาที่คิดว่าจะถึงระหว่าง 1–360 นาที");return}state.estimated=estimate;state.actualMinutes=null;state.completed=false;state.startedAt=Date.now();$("#estimateReadout").textContent=formatMinutes(estimate)+" MIN";$("#startBtn").disabled=true;$("#finishBtn").classList.add("show");$("#resultBox").classList.remove("show");$("#resetBtn").classList.remove("show");$("#shareBtn").classList.remove("show");$("#timeStage").classList.add("running");$("#stageState").textContent="RUNNING";clearInterval(state.timerInterval);state.timerInterval=setInterval(renderTimer,1000);renderTimer()}
-async function init(){
- const on=(selector,event,handler)=>{const el=$(selector);if(el)el.addEventListener(event,handler)};
- on("#beginBtn","click",startExperience);
- on("#dashboardBtn","click",()=>$("#dashboard")?.scrollIntoView({behavior:"smooth"}));
- on("#resetBtn","click",resetRun);
- on("#resultResetBtn","click",resetRun);
- on("#resultDashboardBtn","click",()=>$("#dashboard")?.scrollIntoView({behavior:"smooth"}));
- on("#shareBtn","click",shareReceipt);
- on("#resultShareBtn","click",shareReceipt);
- $$(".excuse-btn").forEach(btn=>btn.addEventListener("click",()=>{
-   if(state.startedAt)return;
-    $$(".excuse-btn").forEach(b=>b.classList.remove("selected"));
-   btn.classList.add("selected");
-   state.customExcuse=btn.id==="otherExcuseBtn";
-   if(state.customExcuse){
-     $("#customExcuseWrap")?.classList.remove("hidden");
-     $("#customExcuse")?.focus();
-     state.excuse=$("#customExcuse")?.value.trim()||null;
-   }else{
-     $("#customExcuseWrap")?.classList.add("hidden");
-     if($("#customExcuse"))$("#customExcuse").value="";
-     state.excuse=btn.dataset.excuse;
-   }
- }));
- on("#customExcuse","input",e=>{if(state.customExcuse)state.excuse=e.target.value.trim()});
- on("#startBtn","click",startRun);
- on("#finishBtn","click",finishRun);
- document.addEventListener("visibilitychange",()=>{if(state.startedAt)renderTimer()});
- if(state.demo){
-   showStatus("DEMO MODE · ยังไม่ได้เชื่อม Supabase","demo");
- }else{
-   try{
-     if(!window.supabase||typeof window.supabase.createClient!=="function")throw new Error("Supabase client unavailable");
-     const{createClient}=window.supabase;
-     state.supabase=createClient(config.url,config.anonKey);
-     showStatus("SYSTEM · LIVE DATABASE CONNECTED");
-   }catch(e){
-     console.warn("Supabase unavailable; falling back to demo mode.",e);
-     state.demo=true;
-     showStatus("DEMO MODE · เชื่อมฐานข้อมูลไม่ได้ชั่วคราว","demo");
-   }
- }
- await fetchStats();
- if(!state.demo){
-   try{state.supabase.channel("sessions-live").on("postgres_changes",{event:"INSERT",schema:"public",table:"sessions"},fetchStats).subscribe()}
-   catch(e){console.warn("Realtime subscription unavailable",e)}
-   setInterval(fetchStats,15000);
- }
-}
+async function init(){$("#beginBtn").addEventListener("click",startExperience);$("#dashboardBtn").addEventListener("click",()=>$("#dashboard").scrollIntoView({behavior:"smooth"}));$("#resetBtn").addEventListener("click",resetRun);$("#resultResetBtn").addEventListener("click",resetRun);$("#resultDashboardBtn").addEventListener("click",()=>$("#dashboard").scrollIntoView({behavior:"smooth"}));$("#shareBtn").addEventListener("click",shareReceipt);$("#resultShareBtn").addEventListener("click",shareReceipt);$$(".excuse-btn").forEach(btn=>btn.addEventListener("click",()=>{if(state.startedAt)return;$$(".excuse-btn").forEach(b=>b.classList.remove("selected"));btn.classList.add("selected");state.customExcuse=btn.id==="otherExcuseBtn";if(state.customExcuse){$("#customExcuseWrap").classList.remove("hidden");$("#customExcuse").focus();state.excuse=$("#customExcuse").value.trim()||null}else{$("#customExcuseWrap").classList.add("hidden");$("#customExcuse").value="";state.excuse=btn.dataset.excuse}}));$("#customExcuse").addEventListener("input",e=>{if(state.customExcuse)state.excuse=e.target.value.trim()});$("#startBtn").addEventListener("click",startRun);$("#finishBtn").addEventListener("click",finishRun);document.addEventListener("visibilitychange",()=>{if(state.startedAt)renderTimer()});if(state.demo){showStatus("DEMO MODE · ยังไม่ได้เชื่อม Supabase","demo")}else{const{createClient}=window.supabase;state.supabase=createClient(config.url,config.anonKey);showStatus("SYSTEM · LIVE DATABASE CONNECTED")}await fetchStats();if(!state.demo){try{state.supabase.channel("sessions-live").on("postgres_changes",{event:"INSERT",schema:"public",table:"sessions"},fetchStats).subscribe()}catch(e){console.warn("Realtime subscription unavailable",e)}setInterval(fetchStats,15000)}}
 init();
 function makeReceiptCanvas(){
  const p=getPersonality(),actual=Number(state.actualMinutes),estimate=Number(state.estimated||0),diff=actual-estimate;
