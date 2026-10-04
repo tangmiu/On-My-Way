@@ -28,23 +28,89 @@ function makeReceiptCanvas(){
  const ctx=canvas.getContext("2d");ctx.textBaseline="top";
  const bg=p.tone==="early"?"#E4F2E6":p.tone==="ontime"?"#DDF2F6":p.tone==="near"?"#FFF0C7":"#FBE2E7";
  const accent=p.tone==="early"?"#76C58A":p.tone==="ontime"?"#65BFD4":p.tone==="near"?"#E5B84E":"#E88391";
- const left=84,right=996,width=912;
- ctx.fillStyle=bg;ctx.fillRect(0,0,1080,1920);ctx.fillStyle=accent;ctx.fillRect(0,0,1080,22);
- ctx.fillStyle="#4A3930";ctx.font="700 40px 'IBM Plex Mono',monospace";ctx.fillText("TIME IS RESPECT",left,205);
- ctx.fillStyle="#806D5F";ctx.font="500 22px 'IBM Plex Mono',monospace";ctx.fillText("YOUR TIME PERSONALITY",left,260);
- ctx.strokeStyle="#D8C8B3";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(left,315);ctx.lineTo(right,315);ctx.stroke();
- ctx.font="190px sans-serif";ctx.fillText(p.emoji,left,355);
- ctx.fillStyle=accent;ctx.font="700 28px 'IBM Plex Mono',monospace";ctx.fillText(p.tag,left,565);
- ctx.fillStyle="#4A3930";ctx.font="800 92px Prompt,sans-serif";ctx.fillText(p.name,left,620);
- ctx.fillStyle="#705C4E";ctx.font="500 34px Prompt,sans-serif";
+ const brown="#4A3930",muted="#806D5F",cream="#FFF8EA",line="#D8C8B3",left=72,width=936;
+ const round=(x,y,w,h,r,fill)=>{ctx.fillStyle=fill;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()};
+ const circle=(x,y,r,fill)=>{ctx.fillStyle=fill;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()};
  const wrap=(text,maxWidth)=>{const chars=Array.from(String(text||"")),lines=[];let line="";for(const ch of chars){const test=line+ch;if(ctx.measureText(test).width>maxWidth&&line){lines.push(line);line=ch}else line=test}if(line)lines.push(line);return lines};
- const lines=wrap(p.desc,width),lineHeight=52;let y=750;for(const l of lines){ctx.fillText(l,left,y);y+=lineHeight}
- const top=Math.min(y+38,1085);ctx.fillStyle="#D8C8B3";ctx.fillRect(left,top,width,3);
- const vals=[["ESTIMATE",formatMinutes(estimate)+" MIN"],["ACTUAL",formatMinutes(actual)+" MIN"],["DIFFERENCE",(diff>0?"+":"")+formatMinutes(diff)+" MIN"]];
- let sy=top+42;for(const[a,b]of vals){ctx.fillStyle="#927F70";ctx.font="600 21px 'IBM Plex Mono',monospace";ctx.fillText(a,left,sy);ctx.fillStyle="#4A3930";ctx.font="700 42px 'IBM Plex Mono',monospace";ctx.fillText(b,left,sy+34);sy+=112}
- ctx.fillStyle=accent;ctx.font="700 25px 'IBM Plex Mono',monospace";ctx.fillText("SAVE THIS. SEND IT TO THE GROUP CHAT.",left,1335);
- ctx.fillStyle="#705C4E";ctx.font="500 30px Prompt,sans-serif";const quoteLines=wrap("เวลาของคุณมีค่า เวลาของคนที่รอก็เหมือนกัน.",width);let qy=1395;for(const l of quoteLines){ctx.fillText(l,left,qy);qy+=46}
- ctx.fillStyle="#806D5F";ctx.font="500 19px 'IBM Plex Mono',monospace";ctx.fillText("BASE ON · TANG MIU",left,1650);ctx.fillText("TIME IS RESPECT",left,1690);
+ ctx.fillStyle=bg;ctx.fillRect(0,0,1080,1920);
+ ctx.fillStyle=accent;ctx.fillRect(0,0,1080,18);
+ ctx.fillStyle=brown;ctx.font="700 34px 'IBM Plex Mono',monospace";ctx.fillText("TIME IS RESPECT",left,70);
+ ctx.fillStyle=muted;ctx.font="500 18px 'IBM Plex Mono',monospace";ctx.fillText("YOUR TIME PERSONALITY",left,116);
+ ctx.fillStyle=line;ctx.fillRect(left,160,left+width-left,2);
+
+ // ART CARD — intentionally kept separate from the working share logic below.
+ round(left,195,width,720,46,cream);
+ ctx.save();ctx.globalAlpha=.48;circle(850,300,150,accent);circle(175,805,125,"#FFFFFF");ctx.globalAlpha=1;
+ ctx.strokeStyle=accent;ctx.lineWidth=4;ctx.beginPath();ctx.arc(825,320,112,.25,Math.PI*1.6);ctx.stroke();
+ ctx.strokeStyle="#D8C8B3";ctx.lineWidth=3;ctx.beginPath();ctx.arc(825,320,92,-.55,.8);ctx.stroke();ctx.restore();
+
+ // Decorative sparkles.
+ const sparkle=(x,y,s)=>{ctx.fillStyle=accent;ctx.beginPath();ctx.moveTo(x,y-s);ctx.lineTo(x+5,y-5);ctx.lineTo(x+s,y);ctx.lineTo(x+5,y+5);ctx.lineTo(x,y+s);ctx.lineTo(x-5,y+5);ctx.lineTo(x-s,y);ctx.lineTo(x-5,y-5);ctx.closePath();ctx.fill()};
+ sparkle(170,310,15);sparkle(890,470,11);sparkle(155,690,9);
+
+ // Refined cute male character.
+ const cx=530;
+ // shadow
+ ctx.fillStyle="#D8C8B3";ctx.beginPath();ctx.ellipse(cx,850,175,24,0,0,Math.PI*2);ctx.fill();
+ // legs / trousers
+ ctx.fillStyle="#66758B";ctx.beginPath();ctx.moveTo(cx-105,760);ctx.lineTo(cx-18,760);ctx.lineTo(cx-28,850);ctx.lineTo(cx-108,850);ctx.closePath();ctx.fill();
+ ctx.beginPath();ctx.moveTo(cx+18,760);ctx.lineTo(cx+105,760);ctx.lineTo(cx+108,850);ctx.lineTo(cx+28,850);ctx.closePath();ctx.fill();
+ // shoes
+ round(cx-122,835,98,27,14,"#4A3930");round(cx+24,835,98,27,14,"#4A3930");
+ // body / jacket
+ round(cx-150,570,300,230,70,"#8EA3B8");
+ round(cx-92,590,184,195,48,"#AFC1D1");
+ // shirt and collar
+ ctx.fillStyle="#FFF8EA";ctx.beginPath();ctx.moveTo(cx-44,585);ctx.lineTo(cx,630);ctx.lineTo(cx+44,585);ctx.lineTo(cx+32,760);ctx.lineTo(cx-32,760);ctx.closePath();ctx.fill();
+ ctx.strokeStyle="#7B8FA5";ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(cx-44,585);ctx.lineTo(cx,630);ctx.lineTo(cx+44,585);ctx.stroke();
+ // arms
+ round(cx-184,600,64,185,30,"#8EA3B8");round(cx+120,600,64,185,30,"#8EA3B8");
+ // hands
+ circle(cx-151,785,27,"#F2C5B2");circle(cx+151,785,27,"#F2C5B2");
+ // neck
+ round(cx-39,505,78,95,25,"#F2C5B2");
+ // ears
+ circle(cx-111,405,27,"#F2C5B2");circle(cx+111,405,27,"#F2C5B2");
+ // face
+ ctx.fillStyle="#F4C8B6";ctx.beginPath();ctx.moveTo(cx-105,325);ctx.quadraticCurveTo(cx-118,455,cx,520);ctx.quadraticCurveTo(cx+118,455,cx+105,325);ctx.quadraticCurveTo(cx,250,cx-105,325);ctx.closePath();ctx.fill();
+ // hair silhouette
+ ctx.fillStyle="#4C403D";ctx.beginPath();ctx.moveTo(cx-120,370);ctx.quadraticCurveTo(cx-130,255,cx-42,225);ctx.quadraticCurveTo(cx+65,188,cx+128,275);ctx.quadraticCurveTo(cx+100,280,cx+70,268);ctx.quadraticCurveTo(cx+95,305,cx+83,350);ctx.lineTo(cx+45,320);ctx.quadraticCurveTo(cx+30,285,cx+5,265);ctx.quadraticCurveTo(cx-32,330,cx-95,345);ctx.lineTo(cx-120,370);ctx.closePath();ctx.fill();
+ // hair highlights
+ ctx.strokeStyle="#74625D";ctx.lineWidth=10;ctx.lineCap="round";ctx.beginPath();ctx.moveTo(cx-65,265);ctx.quadraticCurveTo(cx-35,225,cx+8,220);ctx.moveTo(cx+28,224);ctx.quadraticCurveTo(cx+72,230,cx+96,267);ctx.stroke();
+ // glasses
+ ctx.strokeStyle=brown;ctx.lineWidth=7;round(cx-91,365,78,52,18,"#F7EEE2");round(cx+13,365,78,52,18,"#F7EEE2");
+ ctx.strokeStyle=brown;ctx.strokeRect(cx-91,365,78,52);ctx.strokeRect(cx+13,365,78,52);ctx.beginPath();ctx.moveTo(cx-13,389);ctx.lineTo(cx+13,389);ctx.stroke();
+ // eyes / brows
+ ctx.fillStyle=brown;ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(cx-72,350);ctx.lineTo(cx-31,345);ctx.moveTo(cx+31,345);ctx.lineTo(cx+72,350);ctx.stroke();
+ circle(cx-52,391,7,brown);circle(cx+52,391,7,brown);
+ // nose / smile
+ ctx.strokeStyle="#B86F68";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(cx,405);ctx.lineTo(cx-6,430);ctx.lineTo(cx+8,432);ctx.stroke();
+ ctx.strokeStyle="#A85F67";ctx.lineWidth=5;ctx.beginPath();ctx.arc(cx,445,25,.15,Math.PI-.15);ctx.stroke();
+ // headphones
+ ctx.strokeStyle="#6B788A";ctx.lineWidth=18;ctx.beginPath();ctx.arc(cx,345,126,Math.PI*1.05,Math.PI*1.95);ctx.stroke();
+ circle(cx-125,360,24,"#6B788A");circle(cx+125,360,24,"#6B788A");
+ // tiny clock pin
+ circle(cx+72,642,25,cream);ctx.strokeStyle=accent;ctx.lineWidth=5;ctx.beginPath();ctx.arc(cx+72,642,17,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(cx+72,642);ctx.lineTo(cx+72,630);ctx.moveTo(cx+72,642);ctx.lineTo(cx+82,648);ctx.stroke();
+ // small art caption
+ ctx.fillStyle=brown;ctx.font="700 20px 'IBM Plex Mono',monospace";ctx.fillText("TIME ≠ LATE",left+42,865);
+ ctx.fillStyle=muted;ctx.font="500 17px 'IBM Plex Mono',monospace";ctx.fillText("a little portrait of your timing",left+42,890);
+
+ // Minimal result block.
+ round(left,955,width,515,42,cream);
+ ctx.fillStyle=accent;ctx.font="700 22px 'IBM Plex Mono',monospace";ctx.fillText(p.tag,left+44,1005);
+ ctx.fillStyle=brown;ctx.font="800 82px Prompt,sans-serif";ctx.fillText(p.name,left+44,1050);
+ ctx.fillStyle="#705C4E";ctx.font="500 27px Prompt,sans-serif";
+ const descLines=wrap(p.desc,820);let dy=1150;for(const l of descLines.slice(0,2)){ctx.fillText(l,left+44,dy);dy+=42}
+ // Three clean metrics.
+ const metricY=1265,metricW=260,gap=38;
+ [["ESTIMATE",formatMinutes(estimate)+" MIN"],["ACTUAL",formatMinutes(actual)+" MIN"],["DIFFERENCE",(diff>0?"+":"")+formatMinutes(diff)+" MIN"]].forEach((v,i)=>{
+   const x=left+44+i*(metricW+gap);round(x,metricY,metricW,150,26,i===2?accent:bg);
+   ctx.fillStyle=muted;ctx.font="600 16px 'IBM Plex Mono',monospace";ctx.fillText(v[0],x+20,metricY+22);
+   ctx.fillStyle=brown;ctx.font="700 31px 'IBM Plex Mono',monospace";ctx.fillText(v[1],x+20,metricY+70);
+ });
+ ctx.fillStyle=muted;ctx.font="500 19px Prompt,sans-serif";ctx.fillText("เวลาของคุณมีค่า เวลาของคนที่รอก็เหมือนกัน.",left+44,1515);
+ ctx.fillStyle=brown;ctx.font="700 17px 'IBM Plex Mono',monospace";ctx.fillText("TIME IS RESPECT  ·  TANG MIU",left+44,1570);
+ ctx.fillStyle=muted;ctx.font="500 16px 'IBM Plex Mono',monospace";ctx.fillText("9:16 STORY",left+44,1612);
  return{canvas,status:p.tag,diff}
 }
 function canvasToFile(canvas){
