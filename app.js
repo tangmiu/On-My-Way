@@ -39,9 +39,9 @@ function calculatePlanner(){
  setTimeout(()=>$("#plannerResult").scrollIntoView({behavior:"smooth",block:"center"}),40);
 }
 function initPlanner(){
- $("#plannerTravelPresets button").forEach(btn=>btn.addEventListener("click",()=>{ $("#plannerTravel").value=btn.dataset.min; updatePlannerSelection("#plannerTravelPresets","min",btn.dataset.min)}));
- $("#plannerBufferPresets button").forEach(btn=>btn.addEventListener("click",()=>updatePlannerSelection("#plannerBufferPresets","buffer",btn.dataset.buffer)));
- $("#plannerTravel").addEventListener("input",()=> $ ("#plannerTravelPresets button").forEach(b=>b.classList.remove("selected")));
+ Array.from(document.querySelectorAll("#plannerTravelPresets button")).forEach(btn=>btn.addEventListener("click",()=>{ $("#plannerTravel").value=btn.dataset.min; updatePlannerSelection("#plannerTravelPresets","min",btn.dataset.min)}));
+ Array.from(document.querySelectorAll("#plannerBufferPresets button")).forEach(btn=>btn.addEventListener("click",()=>updatePlannerSelection("#plannerBufferPresets","buffer",btn.dataset.buffer)));
+ $("#plannerTravel").addEventListener("input",()=>Array.from(document.querySelectorAll("#plannerTravelPresets button")).forEach(b=>b.classList.remove("selected")));
  $("#plannerCalculate").addEventListener("click",calculatePlanner);
  updatePlannerSelection("#plannerTravelPresets","min",30);
  updatePlannerSelection("#plannerBufferPresets","buffer",5);
