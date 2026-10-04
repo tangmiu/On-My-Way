@@ -374,3 +374,58 @@ h1 span,h2 span{color:#C96F7D}
   .personality-card{border-radius:24px}
   .excuse-btn{padding:15px 9px}
 }
+
+
+/* v4 ART DIRECTION — decorative only, no interaction/state changes */
+.intro{position:relative;isolation:isolate}
+.intro-art{position:absolute;right:-5%;top:18%;width:430px;height:560px;pointer-events:none;z-index:-1}
+.art-ring{position:absolute;border:2px solid var(--line);border-radius:50%;opacity:.8}
+.art-ring-a{width:390px;height:390px;right:0;top:70px}
+.art-ring-b{width:300px;height:300px;right:45px;top:115px;border-style:dashed;opacity:.55}
+.art-sticker{position:absolute;padding:9px 13px;border:1px solid var(--line);border-radius:999px;background:var(--panel);font:700 11px "IBM Plex Mono",monospace;letter-spacing:.08em;box-shadow:0 8px 25px rgba(74,57,48,.08);transform:rotate(-7deg)}
+.sticker-one{right:15px;top:40px;color:var(--accent)}
+.sticker-two{left:0;top:390px;color:var(--muted);transform:rotate(5deg)}
+.site-mascot{position:absolute;width:250px;height:430px;left:92px;top:82px}
+.mascot-shadow{position:absolute;left:20px;bottom:12px;width:210px;height:26px;border-radius:50%;background:rgba(74,57,48,.12);filter:blur(5px)}
+.mascot-head{position:absolute;left:57px;top:30px;width:138px;height:155px;border-radius:48% 48% 44% 44%;background:#f2c5b2;box-shadow:inset -10px -8px 0 rgba(184,111,104,.07)}
+.mascot-hair{position:absolute;left:-7px;top:-25px;width:153px;height:91px;border-radius:52% 58% 30% 36%;background:#514542;transform:rotate(-4deg)}
+.mascot-hair:after{content:"";position:absolute;right:18px;top:17px;width:55px;height:18px;border-top:7px solid #75635e;border-radius:50%;transform:rotate(12deg)}
+.mascot-ear{position:absolute;top:67px;width:27px;height:40px;border-radius:50%;background:#f2c5b2}
+.mascot-ear.left{left:-14px}.mascot-ear.right{right:-14px}
+.mascot-glasses{position:absolute;top:63px;width:55px;height:37px;border:4px solid #4a3930;border-radius:13px;background:rgba(255,248,234,.45)}
+.mascot-glasses.left{left:12px}.mascot-glasses.right{right:12px}
+.mascot-glasses:after{content:"";position:absolute;top:12px;width:16px;height:4px;background:#4a3930}
+.mascot-glasses.left:after{right:-19px}.mascot-glasses.right:after{left:-19px}
+.mascot-nose{position:absolute;left:67px;top:104px;width:8px;height:16px;border-left:3px solid #b86f68;transform:rotate(12deg)}
+.mascot-mouth{position:absolute;left:53px;top:125px;width:31px;height:15px;border-bottom:4px solid #a85f67;border-radius:0 0 50% 50%}
+.mascot-neck{position:absolute;left:105px;top:174px;width:42px;height:52px;border-radius:13px;background:#f2c5b2}
+.mascot-body{position:absolute;left:37px;top:205px;width:176px;height:185px;border-radius:52px 52px 30px 30px;background:#8ea3b8;box-shadow:inset 0 -20px 0 rgba(74,57,48,.07)}
+.mascot-shirt{position:absolute;left:50px;top:15px;width:76px;height:140px;background:#fff8ea;clip-path:polygon(50% 0,100% 20%,76% 100%,24% 100%,0 20%)}
+.mascot-arm{position:absolute;top:31px;width:42px;height:132px;border-radius:25px;background:#8ea3b8}
+.mascot-arm.left{left:-25px;transform:rotate(7deg)}.mascot-arm.right{right:-25px;transform:rotate(-7deg)}
+.mascot-arm:after{content:"";position:absolute;bottom:-8px;left:7px;width:28px;height:28px;border-radius:50%;background:#f2c5b2}
+.mascot-clock{position:absolute;right:7px;top:235px;width:48px;height:48px;border-radius:50%;background:var(--panel);border:5px solid var(--accent);display:grid;place-items:center;color:var(--text);font:700 12px "IBM Plex Mono",monospace;box-shadow:0 6px 18px rgba(74,57,48,.12);transform:rotate(7deg)}
+.experience{position:relative}
+.experience-deco{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin:-8px 0 22px;color:var(--muted);font:700 10px "IBM Plex Mono",monospace;letter-spacing:.12em}
+.experience-deco i{font-style:normal;font-size:25px;color:var(--accent);animation:softTick 2.5s ease-in-out infinite}
+.dashboard{position:relative;overflow:hidden}
+.dashboard-deco{position:absolute;right:-15px;top:70px;width:190px;height:190px;border:1px solid var(--line);border-radius:50%;opacity:.85;pointer-events:none}
+.dashboard-deco:before{content:"";position:absolute;inset:18px;border:1px dashed var(--line);border-radius:50%}
+.orbit-dot{position:absolute;left:18px;top:78px;width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 8px rgba(242,154,167,.14)}
+.dashboard-sticker{position:absolute;right:18px;top:55px;padding:8px 10px;background:var(--panel);border:1px solid var(--line);font:700 9px/1.45 "IBM Plex Mono",monospace;letter-spacing:.08em;transform:rotate(7deg)}
+.mini-clock{position:absolute;left:67px;bottom:18px;font-style:normal;font-size:44px;color:var(--accent)}
+.closing{position:relative;overflow:hidden}
+.closing-art{width:170px;height:170px;margin:0 auto 35px;border:1px solid var(--line);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-6deg);background:var(--panel);box-shadow:0 16px 40px rgba(74,57,48,.07)}
+.closing-art span{font-size:44px;color:var(--accent);line-height:1}
+.closing-art b,.closing-art i{font:700 11px "IBM Plex Mono",monospace;letter-spacing:.12em;color:var(--text);font-style:normal;margin-top:5px}
+@keyframes softTick{0%,100%{transform:rotate(-5deg) scale(1)}50%{transform:rotate(5deg) scale(1.08)}}
+@media(max-width:750px){
+ .intro-art{right:-92px;top:45%;width:310px;height:390px;opacity:.72}
+ .art-ring-a{width:285px;height:285px}.art-ring-b{width:220px;height:220px;right:32px;top:102px}
+ .site-mascot{transform:scale(.72);transform-origin:top left;left:55px;top:70px}
+ .sticker-one{right:0;top:28px}.sticker-two{left:0;top:300px}
+ .experience-deco{justify-content:space-between;margin-top:4px}
+ .dashboard-deco{right:-75px;top:120px;transform:scale(.78);opacity:.55}
+ .dashboard-head{position:relative;z-index:1}
+ .closing-art{width:145px;height:145px}
+}
