@@ -82,8 +82,8 @@ function makeReceiptCanvas(){
  descLines.forEach((z,i)=>text(z,82,1080+i*42,"500 27px Prompt,sans-serif","#514844"));
  const cards=[["ESTIMATE",formatMinutes(estimate)+" MIN","เวลาที่คิดไว้","#F3DFC0"],["ACTUAL",formatMinutes(actual)+" MIN","เวลาที่ถึงจริง","#F0D5DC"],["DIFFERENCE",(diff>0?"+":"")+formatMinutes(diff)+" MIN","คลาดเคลื่อน",t.soft]];
  cards.forEach((m,i)=>{const x=82+i*306;rr(x,1230,282,214,28,m[3],"rgba(70,55,46,.08)");text(m[0],x+22,1253,"700 17px 'IBM Plex Mono',monospace","#6B5D55");text(m[1],x+22,1303,"900 31px 'IBM Plex Mono',monospace","#30383B");text(m[2],x+22,1368,"500 19px Prompt,sans-serif","#6B5D55")});
- const rank=state.rankStats?.accuracy??0; const personal=buildPersonalStats(); text("YOUR LEVEL",82,1500,"900 34px sans-serif","#30383B"); line(82,1546,345,1546,t.accent,6); text("TOP "+rank+"% · "+(rank>=70?"กะเวลาได้แม่นกว่าคนส่วนใหญ่":"ครั้งนี้ยังคลาดเคลื่อนจากค่าเฉลี่ย"),82,1580,"700 22px Prompt,sans-serif","#5D514B"); text("เล่นแล้ว "+personal.plays+" ครั้ง · คลาดเคลื่อนเฉลี่ย "+formatMinutes(personal.avgError)+" นาที",82,1620,"500 20px Prompt,sans-serif","#806D5F");line(82,1546,345,1546,t.accent,6);
- text("เวลาของทุกคนมีค่าเท่ากัน",82,1580,"500 25px Prompt,sans-serif","#5D514B");
+ const rank=state.rankStats?.accuracy??0; text("YOUR LEVEL",82,1500,"900 34px sans-serif","#30383B"); line(82,1546,345,1546,t.accent,6); text("TOP "+rank+"% · "+(rank>=70?"กะเวลาได้แม่นกว่าคนส่วนใหญ่":"ครั้งนี้ยังคลาดเคลื่อนจากค่าเฉลี่ย"),82,1580,"700 22px Prompt,sans-serif","#5D514B");
+ text("เวลาของทุกคนมีค่าเท่ากัน",82,1640,"500 25px Prompt,sans-serif","#5D514B");
  rr(720,1500,250,104,18,"#F3E7D3","rgba(70,55,46,.08)");
  text("SEE YOU",845,1525,"800 18px 'IBM Plex Mono',monospace","#4D4541","center");text("ON TIME. ♡",845,1555,"900 23px sans-serif","#30383B","center");
  text("TANG MIU",540,1652,"700 16px 'IBM Plex Mono',monospace","#8A776B","center");
