@@ -24,6 +24,7 @@ async function init(){$("#beginBtn").addEventListener("click",startExperience);$
 init();
 
 const shareCharacterImages={early:new Image(),ontime:new Image(),near:new Image(),late:new Image()};
+Object.values(shareCharacterImages).forEach(img=>{img.crossOrigin="anonymous"});
 shareCharacterImages.early.src="https://pikaso.cdnpk.net/private/production/5632892746/render.png?token=exp=1791331200~hmac=76f459454f002c9fbfb4e8bc308d3eee08361e3d987be6eeb959df223b78150a";
 shareCharacterImages.ontime.src="https://pikaso.cdnpk.net/private/production/5632893843/render.png?token=exp=1791331200~hmac=6c4f8743e28decd52c85bb3f50493a0cbfe99d25a5f8a35f400068c078fd9825";
 shareCharacterImages.near.src="https://pikaso.cdnpk.net/private/production/5632892898/render.png?token=exp=1791331200~hmac=0948d6b256c37cd3cc057dfbe9ffecc89f7408b9b206a08355e4122cb8f3b982";
