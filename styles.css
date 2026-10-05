@@ -429,3 +429,16 @@ h1 span,h2 span{color:#C96F7D}
  .dashboard-head{position:relative;z-index:1}
  .closing-art{width:145px;height:145px}
 }
+
+/* v5 — personal level + history, additive only */
+.rank-result{margin-top:22px;padding:18px 20px;border:1px solid #D8C8B3;border-radius:18px;background:#DDF2F6}
+.rank-result-top{display:flex;justify-content:space-between;align-items:center;color:#927F70;font:600 10px "IBM Plex Mono",monospace;letter-spacing:.1em}
+.rank-result-top span:last-child{color:#4A3930;font-size:16px}
+.rank-result strong{display:block;margin-top:9px;color:#4A3930;font-size:20px;line-height:1.35}
+.rank-result small{display:block;margin-top:5px;color:#806D5F;font:500 10px "IBM Plex Mono",monospace}
+.personal-history{display:grid;grid-template-columns:repeat(3,1fr);margin-top:10px;border:1px solid #D8C8B3;border-radius:18px;overflow:hidden;background:#FFF8EA}
+.personal-history>div{padding:16px 12px;border-right:1px solid #D8C8B3}
+.personal-history>div:last-child{border-right:0}
+.personal-history span,.personal-history small{display:block;color:#927F70;font:500 9px "IBM Plex Mono",monospace;letter-spacing:.07em}
+.personal-history strong{display:block;margin:7px 0 2px;color:#4A3930;font:700 23px "IBM Plex Mono",monospace}
+@media(max-width:750px){.personal-history strong{font-size:19px}.rank-result strong{font-size:17px}}
