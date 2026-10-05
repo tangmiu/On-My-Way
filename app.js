@@ -62,7 +62,7 @@ function makeReceiptCanvas(){
 
  ctx.fillStyle=t.bg;ctx.fillRect(0,0,1080,1920);
  const bg=ctx.createLinearGradient(0,0,0,1920);bg.addColorStop(0,"rgba(255,255,255,.52)");bg.addColorStop(.58,"rgba(255,248,235,.08)");bg.addColorStop(1,"rgba(255,255,255,.5)");ctx.fillStyle=bg;ctx.fillRect(0,0,1080,1920);
- text("TIME IS RESPECT",58,50,"900 italic 42px sans-serif","#304047");
+ text("ON MY WAY.",58,50,"900 italic 42px sans-serif","#304047");
  text("THE REAL-TIME EXCUSE DASHBOARD",60,105,"600 17px 'IBM Plex Mono',monospace","#716158");
  rr(850,48,170,116,18,"#F4E7D3","rgba(70,55,46,.08)");
  text("GOOD",875,69,"900 24px sans-serif","#30393B");text("THINGS",866,99,"900 24px sans-serif","#30393B");text("TAKE TIME",855,129,"900 21px sans-serif","#30393B");
@@ -88,19 +88,19 @@ function makeReceiptCanvas(){
  text("SEE YOU",845,1525,"800 18px 'IBM Plex Mono',monospace","#4D4541","center");text("ON TIME. ♡",845,1555,"900 23px sans-serif","#30383B","center");
  text("TANG MIU",540,1652,"700 16px 'IBM Plex Mono',monospace","#8A776B","center");
  ctx.strokeStyle=t.accent;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(930,1718);ctx.lineTo(948,1736);ctx.lineTo(976,1699);ctx.stroke();
- text("TIME IS RESPECT",540,1768,"900 27px sans-serif","#30383B","center");
+ text("ON MY WAY.",540,1768,"900 27px sans-serif","#30383B","center");
  return{canvas,status:p.tag,diff};
 }function canvasToFile(canvas){
  const dataUrl=canvas.toDataURL("image/png");
  const base64=dataUrl.split(",")[1];
  const binary=atob(base64),bytes=new Uint8Array(binary.length);
  for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
- return new File([bytes],"time-is-respect-personality.png",{type:"image/png"});
+ return new File([bytes],"on-my-way-personality.png",{type:"image/png"});
 }
 async function shareReceipt(){
  if(!state.completed||state.actualMinutes==null)return;
  const file=canvasToFile(makeReceiptCanvas().canvas);
- const shareData={files:[file],title:"TIME IS RESPECT",text:"My Time Personality"};
+ const shareData={files:[file],title:"ON MY WAY.",text:"My Time Personality"};
  try{
    if(typeof navigator.share==="function"){
      let supported=false;
@@ -115,7 +115,7 @@ async function shareReceipt(){
    const url=URL.createObjectURL(file);
    const link=document.createElement("a");
    link.href=url;
-   link.download="time-is-respect-personality.png";
+   link.download="on-my-way-personality.png";
    link.style.display="none";
    document.body.appendChild(link);
    link.click();
