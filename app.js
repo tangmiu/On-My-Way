@@ -12,9 +12,9 @@ function robustInliers(items,getValue,minSample=8){
  const usable=items.filter(item=>Number.isFinite(getValue(item)));
  if(usable.length<minSample)return usable;
  const values=usable.map(getValue),center=median(values),deviations=values.map(v=>Math.abs(v-center)),mad=median(deviations);
- // Conservative MAD-based robust-z cutoff; outliers are excluded from averages, never deleted.
- if(mad>0)return usable.filter(item=>0.67448975*Math.abs(getValue(item)-center)/mad<=3.5);
- // If MAD is zero, use Tukey fences only when the interquartile range is measurable.
+ // MAD detects isolated extremes. If it flags over 10% of rows, the distribution may be skewed or multimodal,
+ // so fall back to the more conservative Tukey IQR fences rather than discarding a large valid group.
+ if(mad>0){const madInliers=usable.filter(item=>0.67448975*Math.abs(getValue(item)-center)/mad<=3.5);if(usable.length-madInliers.length<=Math.max(1,Math.floor(usable.length*0.1)))return madInliers}
  const sorted=[...values].sort((a,b)=>a-b),half=Math.floor(sorted.length/2),q1=median(sorted.slice(0,half)),q3=median(sorted.slice(Math.ceil(sorted.length/2))),iqr=q3-q1;
  if(iqr<=0)return usable;
  const lower=q1-1.5*iqr,upper=q3+1.5*iqr;
